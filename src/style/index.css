@@ -1,0 +1,87 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'tailwind-scrollbar-hide/v4';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-md: calc(var(--radius) - 2px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-secondary: var(--secondary);
+  --color-border: var(--border);
+  --color-button: var(--button);
+  --color-button-foreground: var(--button-foreground);
+  --color-card: var(--card);
+  --color-popover: var(--popover);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-destructive: var(--destructive);
+  --color-ring: var(--primary);
+
+  --color-svg-border: var(--svg-border);
+  --color-svg-background: var(--svg-background);
+  --color-svg-accent: var(--svg-accent);
+  --color-svg-muted: var(--svg-muted);
+
+  --animate-line-shadow: line-shadow 15s linear infinite;
+
+  @keyframes line-shadow {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 100% -100%;
+    }
+  }
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0); /** 整体背景颜色 */
+  --foreground: oklch(0.213 0.008 264.406); /** 标题文字颜色 */
+  --secondary: oklch(0.681 0.012 256.816); /** 副标题颜色 */
+  --border: oklch(0.92 0.004 237.296); /** 边框颜色、使用边框hover的背景颜色 */
+  --button: oklch(1 0 0); /** 按钮颜色 */
+  --button-foreground: oklch(0.508 0.013 256.809); /** 按钮文字颜色、icon颜色 */
+  --card: oklch(0.976 0.002 246.668); /** 侧栏颜色、卡片颜色 */
+  --popover: oklch(1 0 0); /** 弹出层背景颜色 */
+  --muted: oklch(0.578 0.012 256.81); /** 占位符颜色、描述文字颜色 */
+  --primary: oklch(0.585 0.233 277.117); /** 主颜色 */
+  --destructive: oklch(0.671 0.213 24.709); /** 错误颜色 */
+
+  --svg-background: oklch(1 0 0);
+  --svg-border: oklch(0.145 0 0);
+  --svg-accent: oklch(0.9 0 0);
+  --svg-muted: oklch(0.77 0 0);
+  --fixed-shadow: oklch(0.11 0 0 / 0.06);
+}
+
+.dark {
+  --background: oklch(0.209 0.004 264.334);
+  --foreground: oklch(0.933 0.004 248.543);
+  --secondary: oklch(0.578 0.012 256.81);
+  --border: oklch(0.312 0.006 258.435);
+  --button: oklch(0.267 0.006 236.927);
+  --button-foreground: oklch(0.727 0.012 256.819);
+  --card: oklch(0.242 0.005 248.162);
+  --popover: oklch(0.209 0.004 264.334);
+  --muted: oklch(0.681 0.012 256.816);
+  --primary: oklch(0.673 0.182 276.935);
+  --destructive: oklch(0.397 0.141 25.699);
+
+  --svg-background: oklch(0 0 0);
+  --svg-border: oklch(0.985 0 0);
+  --svg-accent: oklch(0.69 0 0);
+  --svg-muted: oklch(0.57 0 0);
+  --fixed-shadow: oklch(0.99 0 0 / 0.12);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

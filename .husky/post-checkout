@@ -1,0 +1,5 @@
+command -v pnpm >/dev/null 2>&1 || exit 0
+if git diff --name-only HEAD@{1} HEAD 2>/dev/null | grep -q 'pnpm-lock.yaml'; then
+    echo "📦 Detected pnpm-lock.yaml change, updating dependencies..."
+    pnpm install
+fi
