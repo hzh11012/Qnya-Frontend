@@ -18,6 +18,7 @@
   --color-primary: var(--primary);
   --color-destructive: var(--destructive);
   --color-ring: var(--primary);
+  --color-input: var(--input);
 
   --color-svg-border: var(--svg-border);
   --color-svg-background: var(--svg-background);
@@ -49,6 +50,7 @@
   --muted: oklch(0.578 0.012 256.81); /** 占位符颜色、描述文字颜色 */
   --primary: oklch(0.585 0.233 277.117); /** 主颜色 */
   --destructive: oklch(0.671 0.213 24.709); /** 错误颜色 */
+  --input: oklch(0.961 0.002 246.69); /** 输入框背景颜色 */
 
   --svg-background: oklch(1 0 0);
   --svg-border: oklch(0.145 0 0);
@@ -69,6 +71,7 @@
   --muted: oklch(0.681 0.012 256.816);
   --primary: oklch(0.673 0.182 276.935);
   --destructive: oklch(0.397 0.141 25.699);
+  --input: oklch(0.262 0.006 236.684);
 
   --svg-background: oklch(0 0 0);
   --svg-border: oklch(0.985 0 0);
