@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import type { SearchSuggestItem } from '@/apis/search';
+import type { SearchSuggestItem } from '@/apis';
 
 interface SearchSuggestStore {
   list: SearchSuggestItem[];

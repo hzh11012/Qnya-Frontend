@@ -79,9 +79,10 @@ const SearchInput: React.FC<SearchInputProps> = ({
       setIsFocused(false);
       setKeyword(historyItem);
       createHistory(historyItem);
+      onChange(historyItem);
       onSubmit(historyItem);
     },
-    [createHistory, onSubmit]
+    [createHistory, onChange, onSubmit]
   );
 
   // 处理删除历史记录

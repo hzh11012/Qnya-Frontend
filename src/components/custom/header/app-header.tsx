@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRequest } from 'ahooks';
 import { searchSuggest } from '@/apis';
 import { cn } from '@/lib/utils';
+import { useEffect } from 'react';
 
 const AppHeader: React.FC<React.ComponentProps<typeof Header>> = ({
   ...props
@@ -23,8 +24,12 @@ const AppHeader: React.FC<React.ComponentProps<typeof Header>> = ({
     onSuccess: setList
   });
 
+  useEffect(() => {
+    if (defaultKeyword.trim()) run({ keyword: defaultKeyword });
+  }, []);
+
   const handleSubmit = (value: string) => {
-    navigate(`search?keyword=${value}`);
+    navigate(`search?keyword=${encodeURIComponent(value)}`);
   };
 
   const handleChange = (keyword: string) => {

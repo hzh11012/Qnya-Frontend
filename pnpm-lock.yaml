@@ -50,6 +50,9 @@ importers:
       react-hook-form:
         specifier: ^7.76.0
         version: 7.76.0(react@19.2.6)
+      react-infinite-scroll-component:
+        specifier: ^7.2.1
+        version: 7.2.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       react-router-dom:
         specifier: ^7.15.1
         version: 7.15.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -2719,6 +2722,13 @@ packages:
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
+
+  react-infinite-scroll-component@7.2.1:
+    resolution: {integrity: sha512-yPuEf6VHBJXFt+YXDxjlnAuhorUwiA2cKURx/P6a7WW3k+TvwY/mbx7KP1rQ1hxGzDcwreczRyLIv6eSd1sFIw==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      react: '>=17'
+      react-dom: '>=17'
 
   react-is@16.13.1:
     resolution: {integrity: sha1-eJcppNw23imZ3BVt1sHZwYzqVqQ=}
@@ -5972,6 +5982,11 @@ snapshots:
   react-hook-form@7.76.0(react@19.2.6):
     dependencies:
       react: 19.2.6
+
+  react-infinite-scroll-component@7.2.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+    dependencies:
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
 
   react-is@16.13.1: {}
 
