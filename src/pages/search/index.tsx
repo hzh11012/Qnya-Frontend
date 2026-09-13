@@ -1,5 +1,5 @@
-import { searchAnime } from '@/apis';
-import type { SearchAnimeItem } from '@/apis';
+import { searchAnime } from '@/apis/search';
+import type { SearchAnimeItem } from '@/apis/search';
 import FailAvatar from '@/components/custom/fail-avatar';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Star } from 'lucide-react';
@@ -17,6 +17,8 @@ const AnimeCard = ({ item }: { item: SearchAnimeItem }) => (
         <img
           src={item.cover}
           alt={item.name}
+          loading='lazy'
+          decoding='async'
           className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
           onError={e => {
             (e.currentTarget as HTMLImageElement).style.display = 'none';
