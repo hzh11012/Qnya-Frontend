@@ -1,8 +1,8 @@
 import { LogOutIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMutation } from '@tanstack/react-query';
-import { useAuthStore } from '@/store';
-import { logout } from '@/apis';
+import { useAuthStore } from '@/store/auth';
+import { logout } from '@/apis/auth';
 
 interface LogOutProps {
   className?: string;

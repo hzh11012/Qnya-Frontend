@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '@/store';
+import { useAuthStore } from '@/store/auth';
 
 interface AuthGuardProps {
   children: React.ReactNode;

@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/store';
+import { useAuthStore } from '@/store/auth';
 import FailAvatar from '@/components/custom/fail-avatar';
 import { useShallow } from 'zustand/react/shallow';
 

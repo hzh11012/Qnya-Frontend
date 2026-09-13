@@ -3,9 +3,12 @@ import Logo from '@/components/custom/logo';
 import SearchInput from '@/components/custom/header/search-input';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { searchSuggest } from '@/apis';
+import { searchSuggest, type SearchSuggestItem } from '@/apis/search';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
+
+// 避免每次渲染创建新数组，导致下游 memo 组件失效
+const EMPTY_SUGGESTS: SearchSuggestItem[] = [];
 
 const AppHeader: React.FC<React.ComponentProps<typeof Header>> = ({
   ...props
@@ -29,7 +32,7 @@ const AppHeader: React.FC<React.ComponentProps<typeof Header>> = ({
     enabled: !!debouncedKeyword.trim(),
     placeholderData: keepPreviousData
   });
-  const suggests = data ?? [];
+  const suggests = data ?? EMPTY_SUGGESTS;
 
   const handleSubmit = (value: string) => {
     navigate(`search?keyword=${encodeURIComponent(value)}`);

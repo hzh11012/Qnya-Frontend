@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { LoginForm } from '@/pages/login/login-form';
 import ThemeSwitch from '@/components/custom/theme-switch';
 import { schema, type LoginFormValues } from '@/pages/login/form-schema';
-import { useAuthStore } from '@/store';
+import { useAuthStore } from '@/store/auth';
 import CodeDialog from '@/pages/login/code-dialog';
 import Loading from '@/components/custom/loading';
 import { toast } from 'sonner';

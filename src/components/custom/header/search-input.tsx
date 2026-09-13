@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { CircleXIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSearchHistoryStore } from '@/store';
+import { useSearchHistoryStore } from '@/store/search/search-history';
 import Exception from '@/components/custom/exception';
 import type { SearchSuggestItem } from '@/apis/search';
 
