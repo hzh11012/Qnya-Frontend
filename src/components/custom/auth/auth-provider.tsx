@@ -1,52 +1,19 @@
 import { useEffect } from 'react';
-import { useAuthStore } from '@/store';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Exception from '@/components/custom/exception';
-import { useRequest } from 'ahooks';
-import { me } from '@/apis';
-import { toast } from 'sonner';
 import useDeferredLoading from '@/hooks/use-deferred-loading';
+import { useAuthInit } from '@/hooks/use-auth-init';
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-const useAuthProvider = () => {
-  const setUser = useAuthStore(state => state.setUser);
-  const isInitialized = useAuthStore(state => state.isInitialized);
-  const setInitialized = useAuthStore(state => state.setInitialized);
-
-  const { run } = useRequest(me, {
-    onSuccess: user => {
-      if (user.role !== 'admin') {
-        toast.error('权限不足');
-        setUser(null);
-      } else {
-        setUser(user);
-      }
-    },
-    onError: () => {
-      setUser(null);
-    },
-    onFinally: () => {
-      setInitialized(true);
-    },
-    refreshDeps: [isInitialized],
-    refreshDepsAction: () => {
-      if (!isInitialized) {
-        run();
-      }
-    }
-  });
-
-  return { isInitialized, setUser };
-};
-
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { isInitialized, setUser } = useAuthProvider();
+  // 启动时校验登录态并同步 store
+  const { isInitialized, setUser } = useAuthInit();
   const showLoading = useDeferredLoading(!isInitialized);
 
   useEffect(() => {

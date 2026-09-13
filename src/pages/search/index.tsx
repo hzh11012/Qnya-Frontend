@@ -1,14 +1,14 @@
 import { searchAnime } from '@/apis';
 import type { SearchAnimeItem } from '@/apis';
 import FailAvatar from '@/components/custom/fail-avatar';
-import { useSearchAnimeStore } from '@/store/search';
-import { cn } from '@/lib/utils';
-import { useRequest } from 'ahooks';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { Star } from 'lucide-react';
-import { useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
-import { useShallow } from 'zustand/react/shallow';
+import { cn } from '@/lib/utils';
+
+// 原实现即为每次请求拉取 1 条，行为保持不变
+const PAGE_SIZE = 1;
 
 const AnimeCard = ({ item }: { item: SearchAnimeItem }) => (
   <div className='flex gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer group'>
@@ -88,44 +88,30 @@ const Index = () => {
   const [searchParams] = useSearchParams();
   const keyword = searchParams.get('keyword') || '';
 
-  const { list, page, pageSize, hasMore, setPage, setList, setHasMore } =
-    useSearchAnimeStore(
-      useShallow(state => ({
-        list: state.list,
-        total: state.total,
-        page: state.page,
-        pageSize: state.pageSize,
-        hasMore: state.hasMore,
-        setPage: state.setPage,
-        setHasMore: state.setHasMore,
-        setList: state.setList
-      }))
-    );
-
-  const { loading, runAsync } = useRequest(searchAnime, { manual: true });
-
-  useEffect(() => {
-    if (!keyword) return;
-    setList([]);
-    setPage(1);
-    setHasMore(true);
-    runAsync({ keyword, page: 1, pageSize }).then(data => {
-      setList(data.items);
-      setHasMore(data.items.length === pageSize && data.total > pageSize);
-    });
-  }, [keyword]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const fetchMore = async () => {
-    const nextPage = page + 1;
-    const data = await runAsync({ keyword, page: nextPage, pageSize });
-    setPage(nextPage);
-    if (data.items.length === 0) {
-      setHasMore(false);
-      return;
+  // 关键词变化时 queryKey 变化，自动重置为第一页
+  const query = useInfiniteQuery({
+    queryKey: ['search-anime', keyword],
+    queryFn: ({ pageParam }) =>
+      searchAnime({ keyword, page: pageParam, pageSize: PAGE_SIZE }),
+    initialPageParam: 1,
+    enabled: !!keyword,
+    getNextPageParam: (lastPage, allPages) => {
+      const fetched = allPages.reduce(
+        (sum, page) => sum + page.items.length,
+        0
+      );
+      return fetched < lastPage.total && lastPage.items.length > 0
+        ? allPages.length + 1
+        : undefined;
     }
-    const newList = [...list, ...data.items];
-    setList(newList);
-    setHasMore(newList.length < data.total);
+  });
+
+  const list = query.data?.pages.flatMap(page => page.items) ?? [];
+
+  const fetchMore = () => {
+    if (query.hasNextPage && !query.isFetchingNextPage) {
+      query.fetchNextPage();
+    }
   };
 
   if (!keyword) {
@@ -136,7 +122,7 @@ const Index = () => {
     );
   }
 
-  if (!loading && list.length === 0) {
+  if (!query.isPending && list.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center h-60 text-muted-foreground gap-2'>
         <p className='text-sm'>未找到与「{keyword}」相关的内容</p>
@@ -148,7 +134,7 @@ const Index = () => {
     <InfiniteScroll
       dataLength={list.length}
       next={fetchMore}
-      hasMore={hasMore}
+      hasMore={!!query.hasNextPage}
       loader={''}
     >
       <div className='space-y-1'>

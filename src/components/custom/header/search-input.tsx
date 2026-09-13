@@ -1,8 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { CircleXIcon } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
-import { useClickAway } from 'ahooks';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchHistoryStore } from '@/store';
 import Exception from '@/components/custom/exception';
 import type { SearchSuggestItem } from '@/apis/search';
@@ -29,7 +28,20 @@ const SearchInput: React.FC<SearchInputProps> = ({
   const [keyword, setKeyword] = useState(defaultKeyword);
   const [isFocused, setIsFocused] = useState(false);
 
-  useClickAway(() => setIsFocused(false), containerRef, 'mousedown');
+  // 点击容器外部时收起下拉
+  useEffect(() => {
+    if (!isFocused) return;
+    const handlePointerDown = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setIsFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, [isFocused]);
 
   const activated = !!(keyword || isFocused);
 

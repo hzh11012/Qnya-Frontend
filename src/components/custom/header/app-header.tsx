@@ -1,12 +1,11 @@
 import { Header, HeaderLeft, HeaderRight } from '@/components/ui/header';
 import Logo from '@/components/custom/logo';
 import SearchInput from '@/components/custom/header/search-input';
-import { useSearchSuggestStore } from '@/store';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useRequest } from 'ahooks';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { searchSuggest } from '@/apis';
 import { cn } from '@/lib/utils';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const AppHeader: React.FC<React.ComponentProps<typeof Header>> = ({
   ...props
@@ -15,28 +14,29 @@ const AppHeader: React.FC<React.ComponentProps<typeof Header>> = ({
   const [searchParams] = useSearchParams();
   const defaultKeyword = searchParams.get('keyword') || '';
 
-  const suggests = useSearchSuggestStore(state => state.list);
-  const setList = useSearchSuggestStore(state => state.setList);
-
-  const { run } = useRequest(searchSuggest, {
-    manual: true,
-    loadingDelay: 150,
-    onSuccess: setList
-  });
+  // 关键词防抖：输入停顿 300ms 后才发起联想请求
+  const [keyword, setKeyword] = useState('');
+  const [debouncedKeyword, setDebouncedKeyword] = useState(defaultKeyword);
 
   useEffect(() => {
-    if (defaultKeyword.trim()) run({ keyword: defaultKeyword });
-  }, []);
+    const timer = setTimeout(() => setDebouncedKeyword(keyword), 300);
+    return () => clearTimeout(timer);
+  }, [keyword]);
+
+  const { data } = useQuery({
+    queryKey: ['search-suggest', debouncedKeyword],
+    queryFn: () => searchSuggest({ keyword: debouncedKeyword }),
+    enabled: !!debouncedKeyword.trim(),
+    placeholderData: keepPreviousData
+  });
+  const suggests = data ?? [];
 
   const handleSubmit = (value: string) => {
     navigate(`search?keyword=${encodeURIComponent(value)}`);
   };
 
-  const handleChange = (keyword: string) => {
-    if (keyword.trim()) {
-      setList([]);
-      run({ keyword });
-    }
+  const handleChange = (value: string) => {
+    setKeyword(value);
   };
 
   return (
