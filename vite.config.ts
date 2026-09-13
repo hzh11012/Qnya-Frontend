@@ -7,7 +7,7 @@ import svgr from 'vite-plugin-svgr';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(() => ({
   plugins: [
     react(),
     babel({
@@ -15,7 +15,10 @@ export default defineConfig({
     }),
     tailwindcss(),
     svgr({ include: './src/assets/*.svg?react' }),
-    visualizer({ open: true, gzipSize: true, filename: 'stats.html' })
+    // 仅在 pnpm analyze（ANALYZE=true）时生成并打开依赖分析报告
+    ...(process.env.ANALYZE
+      ? [visualizer({ open: true, gzipSize: true, filename: 'stats.html' })]
+      : [])
   ],
   resolve: {
     alias: {
@@ -34,4 +37,4 @@ export default defineConfig({
       }
     }
   }
-});
+}));
