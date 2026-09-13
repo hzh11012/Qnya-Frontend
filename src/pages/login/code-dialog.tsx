@@ -60,10 +60,13 @@ const CodeDialog: React.FC<CodeDialogProps> = ({
       open={open}
       onOpenChange={handleOpenChange}
     >
-      <DialogContent className='w-85.5 sm:w-full'>
+      <DialogContent className='w-full max-w-[min(21.875rem,calc(100%-2rem))] p-4 sm:p-6'>
         <DialogHeader>
           <DialogTitle className='text-lg'>请输入验证码</DialogTitle>
-          <DialogDescription>邮箱验证码已发送至 {email}</DialogDescription>
+          <DialogDescription className='text-sm text-muted'>
+            邮箱验证码已发送至
+            <span className='text-foreground font-medium'> {email}</span>
+          </DialogDescription>
         </DialogHeader>
         <div className='mx-auto my-7.5'>
           <InputOTP
@@ -74,11 +77,11 @@ const CodeDialog: React.FC<CodeDialogProps> = ({
             onChange={setCode}
           >
             <InputOTPGroup>
-              <div className='flex w-full sm:gap-5'>
+              <div className='flex w-full gap-1.5 sm:gap-2'>
                 {[0, 1, 2, 3, 4, 5].map(index => (
                   <InputOTPSlot
                     key={index}
-                    className='rounded-none sm:rounded-md'
+                    className='size-11 rounded-xl border-border bg-background first:rounded-l-xl last:rounded-r-xl dark:border-border/60'
                     index={index}
                   />
                 ))}
@@ -86,9 +89,10 @@ const CodeDialog: React.FC<CodeDialogProps> = ({
             </InputOTPGroup>
           </InputOTP>
         </div>
-        <DialogFooter>
+        <DialogFooter className='justify-start'>
           <Button
-            className='max-w-75 w-full'
+            variant='outline'
+            className='h-11 w-full rounded-xl'
             onClick={handleSendCode}
             disabled={isDisable}
           >

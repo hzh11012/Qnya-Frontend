@@ -1,62 +1,25 @@
-import { useCallback, useRef, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '@/components/custom/logo';
 import { useForm, useWatch } from 'react-hook-form';
 import { LineShadowText } from '@/components/ui/line-shadow-text';
 import { Button } from '@/components/ui/button';
 import { LoginForm } from '@/pages/login/login-form';
+import ThemeSwitch from '@/components/custom/theme-switch';
 import { schema, type LoginFormValues } from '@/pages/login/form-schema';
-import useCountDown from '@/hooks/use-count-down';
-import { useRequest } from 'ahooks';
 import { useAuthStore } from '@/store';
 import CodeDialog from '@/pages/login/code-dialog';
 import Loading from '@/components/custom/loading';
-import { login, sendCode } from '@/apis';
 import { toast } from 'sonner';
-
-const useAuthLogin = () => {
-  const [open, setOpen] = useState(false);
-  const lastSentEmailRef = useRef('');
-  const { start, count, isDisable, reset } = useCountDown(60);
-  const { run: onSendCode, loading } = useRequest(sendCode, {
-    manual: true,
-    debounceWait: 250,
-    onSuccess: () => {
-      start();
-    }
-  });
-  const { runAsync: onLogin } = useRequest(login, {
-    manual: true,
-    debounceWait: 250
-  });
-
-  const handleSendCode = useCallback(
-    (email: string) => {
-      const emailChanged = lastSentEmailRef.current !== email;
-      if (emailChanged) {
-        reset();
-      }
-      if (!isDisable || emailChanged) {
-        onSendCode(email);
-        lastSentEmailRef.current = email;
-      }
-      setOpen(true);
-    },
-    [isDisable, onSendCode, reset]
-  );
-
-  return {
-    open,
-    setOpen,
-    count,
-    isDisable,
-    handleSendCode,
-    loading,
-    onLogin
-  };
-};
+import {
+  FlyDanmakuLayer,
+  LoginBackground,
+  LoginFootnotes
+} from '@/pages/login/background';
+import { useFlyDanmaku } from '@/pages/login/use-fly-danmaku';
+import { useAuthLogin } from '@/pages/login/use-auth-login';
 
 const Login: React.FC = () => {
+  const { flies, onBackgroundClick } = useFlyDanmaku();
   const { open, setOpen, count, isDisable, handleSendCode, loading, onLogin } =
     useAuthLogin();
   const setInitialized = useAuthStore(state => state.setInitialized);
@@ -95,27 +58,47 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className='flex items-center justify-center size-full overflow-auto scrollbar-hide select-none'>
-      <div className='relative w-87.5 h-auto rounded-md p-6 border-0 sm:border'>
-        <div className='flex items-center gap-4 mb-10.5'>
+    <div
+      className='relative flex items-center justify-center size-full overflow-auto scrollbar-hide select-none'
+      onClick={onBackgroundClick}
+    >
+      <ThemeSwitch className='absolute top-4 right-4 z-10 flex size-10 cursor-pointer items-center justify-center rounded-full border bg-card/60 text-foreground/60 backdrop-blur-md transition-colors hover:bg-card hover:text-foreground' />
+      <LoginBackground />
+      <LoginFootnotes />
+      <FlyDanmakuLayer flies={flies} />
+      <div className='relative my-auto flex w-[calc(100%-2rem)] max-w-87.5 flex-col pb-12'>
+        <div className='animate-fade-up mt-8 flex items-center gap-3.5'>
           <Logo
             type='favicon'
-            className='size-14'
+            className='animate-float size-12'
           />
-          <h3 className='font-semibold text-primary text-4xl'>
+          <h3 className='font-display font-semibold text-primary text-5xl'>
             Q<LineShadowText className='italic'>nya</LineShadowText>
           </h3>
         </div>
-        <div className='font-semibold text-lg mx-2 mb-3'>邮箱登录/注册</div>
-        <div className='text-sm mx-2 mb-10'>
+        <div className='animate-fade-up mt-10 flex items-center gap-3 [animation-delay:90ms]'>
+          <div
+            aria-hidden
+            className='h-px w-10 bg-linear-to-r from-primary/60 to-transparent'
+          />
+          <span className='font-display text-[11px] font-medium uppercase tracking-[0.3em] text-muted'>
+            Sign in
+          </span>
+        </div>
+        <div className='animate-fade-up mt-2.5 font-semibold text-lg [animation-delay:160ms]'>
+          邮箱登录 / 注册
+        </div>
+        <div className='animate-fade-up mb-8 mt-1 text-sm text-muted [animation-delay:230ms]'>
           未注册用户验证后将自动注册并登录
         </div>
-        <LoginForm
-          form={form}
-          onSubmit={handleSubmit}
-        />
+        <div className='animate-fade-up [&_input]:h-11 [&_input]:rounded-xl [&_input]:border-border/60 [&_input]:bg-card/60 [&_input]:backdrop-blur-md [animation-delay:300ms]'>
+          <LoginForm
+            form={form}
+            onSubmit={handleSubmit}
+          />
+        </div>
         <Button
-          className='w-full mt-10'
+          className='animate-fade-up mt-5 h-11 w-full rounded-xl shadow-lg shadow-primary/20 [animation-delay:370ms]'
           type='submit'
           onClick={form.handleSubmit(handleSubmit)}
         >
