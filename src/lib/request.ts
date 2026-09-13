@@ -80,9 +80,15 @@ class AxiosRequest {
     );
   }
 
+  // 响应拦截器已解包响应外层（返回 data）， axios 1.20 起方法签名无法直接表达
+  // 这种改写，统一在此断言为业务数据类型
+  private unwrap<T>(promise: Promise<unknown>): Promise<T> {
+    return promise as Promise<T>;
+  }
+
   // GET 请求
   get<T = any>(url: string, config?: RequestConfig): Promise<T> {
-    return this.instance.get(url, config);
+    return this.unwrap(this.instance.get(url, config));
   }
 
   // POST 请求
@@ -91,7 +97,7 @@ class AxiosRequest {
     data?: unknown,
     config?: RequestConfig
   ): Promise<T> {
-    return this.instance.post(url, data, config);
+    return this.unwrap(this.instance.post(url, data, config));
   }
 
   // PUT 请求
@@ -100,12 +106,12 @@ class AxiosRequest {
     data?: unknown,
     config?: RequestConfig
   ): Promise<T> {
-    return this.instance.put(url, data, config);
+    return this.unwrap(this.instance.put(url, data, config));
   }
 
   // DELETE 请求
   delete<T = any>(url: string, config?: RequestConfig): Promise<T> {
-    return this.instance.delete(url, config);
+    return this.unwrap(this.instance.delete(url, config));
   }
 
   // PATCH 请求
@@ -114,7 +120,7 @@ class AxiosRequest {
     data?: unknown,
     config?: RequestConfig
   ): Promise<T> {
-    return this.instance.patch(url, data, config);
+    return this.unwrap(this.instance.patch(url, data, config));
   }
 }
 
