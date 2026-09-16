@@ -28,7 +28,11 @@ const useSearchHistoryStore = create<SearchHistory>()(
         },
         clearHistory: () => set({ list: [] })
       })),
-      { name: 'qnya-search-history' }
+      {
+        name: 'qnya-search-history',
+        // 结构变更时递增版本号，避免旧 localStorage 数据不兼容
+        version: 1
+      }
     )
   )
 );

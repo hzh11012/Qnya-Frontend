@@ -9,6 +9,8 @@ import type { SearchSuggestItem } from '@/apis/search';
 interface SearchInputProps {
   defaultKeyword?: string;
   suggests: SearchSuggestItem[];
+  /** 联想结果未就绪（防抖/请求中），此时不渲染空态，避免闪烁 */
+  pending?: boolean;
   className?: string;
   placeholder?: string;
   onSubmit: (value: string) => void;
@@ -20,6 +22,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   onSubmit,
   onChange,
   suggests,
+  pending = false,
   defaultKeyword = '',
   ...props
 }) => {
@@ -70,11 +73,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
   };
 
   // 处理清空输入
-  const handleClear = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setKeyword('');
-    inputRef.current?.focus();
-  }, []);
+  const handleClear = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setKeyword('');
+      onChange('');
+      inputRef.current?.focus();
+    },
+    [onChange]
+  );
 
   // 处理键盘事件
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -156,10 +163,10 @@ const SearchInput: React.FC<SearchInputProps> = ({
             >
               {suggests.length ? (
                 <>
-                  {suggests.map((item, index) => {
+                  {suggests.map(item => {
                     return (
                       <div
-                        key={index}
+                        key={item.name}
                         className={cn(
                           'flex items-center h-8 text-sm cursor-pointer px-4',
                           'hover:bg-input'
@@ -176,7 +183,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                     );
                   })}
                 </>
-              ) : (
+              ) : pending ? null : ( // 结果未就绪：短暂留白，等响应到达后直接渲染
                 <Exception
                   type='empty'
                   className='h-34 md:h-34'
