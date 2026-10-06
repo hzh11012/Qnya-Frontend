@@ -127,7 +127,13 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground select-none;
+  }
+  /* 输入类元素恢复可选中，保证能复制/编辑已输入内容 */
+  input,
+  textarea {
+    user-select: text;
+    -webkit-user-select: text;
   }
 }
 

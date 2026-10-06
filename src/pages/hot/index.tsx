@@ -1,53 +1,45 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Exception from '@/components/custom/exception';
 import PageTitle from '@/components/custom/page-title';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getTopicList } from '@/apis/topic';
-import type { TopicItem } from '@/apis/topic';
+import { getHotList } from '@/apis/hot';
+import type { HotAnimeItem } from '@/apis/hot';
+import { getStatusText } from '@/lib/anime';
 import CoverImage from '@/components/custom/cover-image';
 
 const PAGE_SIZE = 20;
 
-/** 专题卡片网格：2→3→4→5 随宽度平滑过渡 */
-const TOPIC_GRID_CLASS =
-  'grid grid-cols-2 gap-x-4 gap-y-6 text-sm md:gap-x-6 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5';
+/** 热门卡片网格：2→3→4→5→6→7 随宽度平滑过渡 */
+const HOT_GRID_CLASS =
+  'grid grid-cols-2 gap-x-4 gap-y-6 text-sm sm:grid-cols-3 md:grid-cols-4 md:gap-x-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
 
-const TopicCardSkeleton: React.FC = () => {
+const HotCardSkeleton: React.FC = () => {
   return (
     <div className='w-full flex flex-col gap-2'>
-      <Skeleton className='rounded-sm aspect-[16/9] w-full' />
-      <Skeleton className='w-2/3 h-4 rounded-sm' />
+      <Skeleton className='rounded-sm aspect-[3/4] w-full' />
+      <Skeleton className='w-3/4 h-4 rounded-sm' />
       <Skeleton className='w-full h-3 rounded-sm' />
     </div>
   );
 };
 
-TopicCardSkeleton.displayName = 'TopicCardSkeleton';
+HotCardSkeleton.displayName = 'HotCardSkeleton';
 
-interface TopicCardProps {
-  topic: TopicItem;
-  onClick: (id: string) => void;
-}
-
-const TopicCard: React.FC<TopicCardProps> = ({ topic, onClick }) => {
-  const { id, name, description, cover, animeCount } = topic;
+const HotCard: React.FC<{ item: HotAnimeItem }> = ({ item }) => {
+  const { name, cover, description } = item;
 
   return (
-    <div
-      className='w-full flex flex-col gap-2 cursor-pointer'
-      onClick={() => onClick(id)}
-    >
-      <div className='group relative rounded-sm aspect-[16/9] overflow-hidden'>
+    <div className='w-full flex flex-col gap-2 cursor-pointer'>
+      <div className='group relative rounded-sm aspect-[3/4] overflow-hidden'>
         {/* 动画 inset 而非 transform scale：GPU 合成的 scale 会拉伸旧纹理导致过渡期模糊 */}
         <div className='absolute inset-0 transition-[inset] duration-200 group-hover:-inset-[2.5%]'>
           <CoverImage src={cover} />
         </div>
         <div className='absolute inset-x-0 -bottom-0.5 h-10 bg-card-cover' />
         <div className='absolute bottom-1.5 right-2 text-white text-xs'>
-          {animeCount} 个动漫
+          {getStatusText(item)}
         </div>
       </div>
       <div
@@ -66,15 +58,11 @@ const TopicCard: React.FC<TopicCardProps> = ({ topic, onClick }) => {
   );
 };
 
-TopicCard.displayName = 'TopicCard';
-
 const Index = () => {
-  const navigate = useNavigate();
-
   const query = useInfiniteQuery({
-    queryKey: ['topic-list'],
+    queryKey: ['hot-list'],
     queryFn: ({ pageParam }) =>
-      getTopicList({ page: pageParam, pageSize: PAGE_SIZE }),
+      getHotList({ page: pageParam, pageSize: PAGE_SIZE }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const fetched = allPages.reduce(
@@ -92,10 +80,6 @@ const Index = () => {
     [query.data]
   );
 
-  const handleTopicClick = (id: string) => {
-    if (id) navigate(`/topic/${id}`);
-  };
-
   const fetchMore = () => {
     if (query.hasNextPage && !query.isFetchingNextPage) {
       query.fetchNextPage();
@@ -105,10 +89,10 @@ const Index = () => {
   if (query.isPending) {
     return (
       <div className='my-4 md:my-8'>
-        <PageTitle className='mb-3 md:mb-4'>专题推荐</PageTitle>
-        <div className={TOPIC_GRID_CLASS}>
-          {Array.from({ length: 10 }, (_, index) => (
-            <TopicCardSkeleton key={index} />
+        <PageTitle className='mb-3 md:mb-4'>热门动漫排行</PageTitle>
+        <div className={HOT_GRID_CLASS}>
+          {Array.from({ length: 14 }, (_, index) => (
+            <HotCardSkeleton key={index} />
           ))}
         </div>
       </div>
@@ -120,8 +104,8 @@ const Index = () => {
   }
 
   return (
-    <div className='my-4 md:my-8'>
-      <PageTitle className='mb-3 md:mb-4'>专题推荐</PageTitle>
+    <div className='my-4 md:my-8 overflow-clip'>
+      <PageTitle className='mb-3 md:mb-4'>热门动漫排行</PageTitle>
       <InfiniteScroll
         // 组件默认给容器加内联 overflow: auto，避免撑出多余滚动条
         style={{ overflow: 'visible' }}
@@ -130,15 +114,21 @@ const Index = () => {
         hasMore={!!query.hasNextPage}
         loader={''}
       >
-        <div className={TOPIC_GRID_CLASS}>
+        <div className={HOT_GRID_CLASS}>
           {list.map(item => (
-            <TopicCard
+            <HotCard
               key={item.id}
-              topic={item}
-              onClick={handleTopicClick}
+              item={item}
             />
           ))}
-          {query.isFetchingNextPage && <TopicCardSkeleton />}
+          {query.isFetchingNextPage && (
+            <>
+              <HotCardSkeleton />
+              <HotCardSkeleton />
+              <HotCardSkeleton />
+              <HotCardSkeleton />
+            </>
+          )}
         </div>
       </InfiniteScroll>
     </div>

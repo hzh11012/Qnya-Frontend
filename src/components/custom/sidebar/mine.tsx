@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
-import FailAvatar from '@/components/custom/fail-avatar';
 import { useShallow } from 'zustand/react/shallow';
 
 const Mine = () => {
@@ -26,7 +25,7 @@ const Mine = () => {
         alt={name}
       />
       <AvatarFallback>
-        <FailAvatar />
+        <div className='size-full bg-fail-avatar bg-cover' />
       </AvatarFallback>
     </Avatar>
   );

@@ -66,6 +66,10 @@ const staticRoutes: RouteObject[] = [
             )
           },
           {
+            path: 'rank',
+            lazy: createLazyComponent(() => import('@/pages/hot/index'))
+          },
+          {
             path: '*',
             element: <Exception />
           }

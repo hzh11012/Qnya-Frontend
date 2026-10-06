@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { typeLabel, monthLabel } from '@/lib/labels';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import CoverImage from '@/components/custom/cover-image';
 import type { SearchAnimeItem } from '@/apis/search';
 
 // 按钮宽度（size-8 = 32px）+ 间距（gap-2 = 8px），用于估算一行可容纳的剧集数
@@ -155,13 +156,16 @@ const AnimeSearchCard: React.FC<AnimeSearchCardProps> = memo(
       <div className={cn('w-full flex gap-2 md:gap-4', className)}>
         <div
           className={cn(
-            'relative rounded-sm bg-muted bg-cover bg-center shrink-0 aspect-[3/4] overflow-hidden',
+            'relative bg-muted shrink-0 aspect-[3/4] overflow-hidden',
             'md:cursor-pointer w-37 2xl:w-48',
             'transition-[width] duration-200'
           )}
-          style={image ? { backgroundImage: `url("${image}")` } : undefined}
           onClick={() => videoId && onAnimeClick(videoId)}
         >
+          <CoverImage
+            src={image}
+            className='absolute inset-0'
+          />
           <div
             className={cn(
               'absolute top-3 right-0 text-white text-xs bg-primary pl-2 pr-1.5 py-0.5 rounded-l-lg'
