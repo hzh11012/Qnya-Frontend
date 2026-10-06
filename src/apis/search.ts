@@ -5,6 +5,7 @@ interface SearchSuggestQuery {
 }
 
 interface SearchSuggestItem {
+  id: string;
   name: string;
   highlightName: string;
 }
@@ -15,7 +16,7 @@ interface SearchAnimeQuery extends SearchSuggestQuery {
 }
 
 interface SearchAnimeItem {
-  id: number;
+  id: string;
   name: string;
   description: string;
   cover: string;
@@ -29,11 +30,11 @@ interface SearchAnimeItem {
   avgScore: number;
   scoreCount: number;
   videoCount: number;
-  videoId: number | null;
+  videoId: string | null;
   highlightName: string;
   videos: {
-    id: number;
-    name: string;
+    id: string;
+    episode: number;
   }[];
 }
 

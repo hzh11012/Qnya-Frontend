@@ -18,8 +18,20 @@ const AppHeader: React.FC<React.ComponentProps<typeof Header>> = ({
   const defaultKeyword = searchParams.get('keyword') || '';
 
   // 关键词短防抖：避免逐字请求，同时保持接近实时的响应
-  const [keyword, setKeyword] = useState('');
+  // keyword 必须同样用 defaultKeyword 初始化：
+  // 否则挂载 150ms 后防抖 effect 会把 debouncedKeyword 冲成 ''，
+  // 导致直接访问 /search?keyword=xxx 后聚焦输入框时联想词为空且不发请求
+  const [keyword, setKeyword] = useState(defaultKeyword);
   const [debouncedKeyword, setDebouncedKeyword] = useState(defaultKeyword);
+
+  // URL keyword 变化（手动改地址、前进/后退等）时同步输入框与防抖值。
+  // 采用 render 期间调整状态的模式，避免多余的 effect 与一次错误渲染
+  const [prevUrlKeyword, setPrevUrlKeyword] = useState(defaultKeyword);
+  if (defaultKeyword !== prevUrlKeyword) {
+    setPrevUrlKeyword(defaultKeyword);
+    setKeyword(defaultKeyword);
+    setDebouncedKeyword(defaultKeyword);
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedKeyword(keyword), 150);

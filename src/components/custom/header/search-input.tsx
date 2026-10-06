@@ -26,10 +26,18 @@ const SearchInput: React.FC<SearchInputProps> = ({
   defaultKeyword = '',
   ...props
 }) => {
-  const containerRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [keyword, setKeyword] = useState(defaultKeyword);
   const [isFocused, setIsFocused] = useState(false);
+
+  // URL keyword 变化（手动改地址、前进/后退等）时同步输入框显示。
+  // render 期间调整状态，避免额外 effect 与一次错误渲染
+  const [prevDefaultKeyword, setPrevDefaultKeyword] = useState(defaultKeyword);
+  if (defaultKeyword !== prevDefaultKeyword) {
+    setPrevDefaultKeyword(defaultKeyword);
+    setKeyword(defaultKeyword);
+  }
 
   // 点击容器外部时收起下拉
   useEffect(() => {
@@ -166,7 +174,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                   {suggests.map(item => {
                     return (
                       <div
-                        key={item.name}
+                        key={item.id}
                         className={cn(
                           'flex items-center h-8 text-sm cursor-pointer px-4',
                           'hover:bg-input'

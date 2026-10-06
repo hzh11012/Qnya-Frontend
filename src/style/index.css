@@ -1,4 +1,5 @@
 @import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/noto-sans-sc';
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'tailwind-scrollbar-hide/v4';
@@ -6,9 +7,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  --font-sans:
+    ui-sans-serif, system-ui, 'Noto Sans SC Variable', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+
   --font-display:
-    'Space Grotesk Variable', 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', ui-sans-serif, system-ui, sans-serif;
+    'Space Grotesk Variable', 'Noto Sans SC Variable', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', ui-sans-serif, system-ui, sans-serif;
 
   --animate-fade-up: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-fade-in: fade-in 0.45s ease-out both;
@@ -44,8 +49,10 @@
   --color-button: var(--button);
   --color-button-foreground: var(--button-foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --color-primary: var(--primary);
   --color-destructive: var(--destructive);
   --color-ring: var(--primary);
@@ -77,8 +84,10 @@
   --button: oklch(1 0 0); /** 按钮颜色 */
   --button-foreground: oklch(0.508 0.013 256.809); /** 按钮文字颜色、icon颜色 */
   --card: oklch(0.976 0.002 246.668); /** 侧栏颜色、卡片颜色 */
+  --card-foreground: oklch(0.508 0.013 256.809); /** 卡片内次要文字颜色 */
   --popover: oklch(1 0 0); /** 弹出层背景颜色 */
   --muted: oklch(0.578 0.012 256.81); /** 占位符颜色、描述文字颜色 */
+  --muted-foreground: oklch(0.578 0.012 256.81); /** 描述文字颜色 */
   --primary: oklch(0.585 0.233 277.117); /** 主颜色 */
   --destructive: oklch(0.671 0.213 24.709); /** 错误颜色 */
   --input: oklch(0.961 0.002 246.69); /** 输入框背景颜色 */
@@ -98,8 +107,10 @@
   --button: oklch(0.267 0.006 236.927);
   --button-foreground: oklch(0.727 0.012 256.819);
   --card: oklch(0.242 0.005 248.162);
+  --card-foreground: oklch(0.727 0.012 256.819);
   --popover: oklch(0.209 0.004 264.334);
   --muted: oklch(0.681 0.012 256.816);
+  --muted-foreground: oklch(0.681 0.012 256.816);
   --primary: oklch(0.673 0.182 276.935);
   --destructive: oklch(0.397 0.141 25.699);
   --input: oklch(0.262 0.006 236.684);
@@ -139,7 +150,8 @@
   }
 }
 
-.bg-grid {
+/* 网格背景：可用 hover:/md: 等 Tailwind 变体修饰 */
+@utility bg-grid {
   background-image:
     linear-gradient(to right, var(--border) 1px, transparent 1px),
     linear-gradient(to bottom, var(--border) 1px, transparent 1px);
@@ -175,4 +187,26 @@
     opacity: 0;
     transform: translate(var(--fly), -50%);
   }
+}
+
+/* 卡片封面底部阴影：平滑缓动的黑色渐变，配合绝对定位铺在容器底部 */
+@utility bg-card-cover {
+  background-image: linear-gradient(
+    #0000,
+    #00000001 8.07%,
+    #00000004 15.54%,
+    #00000009 22.5%,
+    #0000000f 29.04%,
+    #00000017 35.26%,
+    #00000021 41.25%,
+    #0000002c 47.1%,
+    #00000039 52.9%,
+    #00000047 58.75%,
+    #00000056 64.74%,
+    #00000067 70.96%,
+    #00000078 77.5%,
+    #0000008b 84.46%,
+    #0000009e 91.93%,
+    #000000b3
+  );
 }
