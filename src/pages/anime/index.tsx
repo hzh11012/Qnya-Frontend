@@ -170,23 +170,20 @@ const Anime: React.FC = () => {
     onSuccess: invalidateDetail
   });
 
-  const handleCollected = () => {
-    toggleCollection(videoId)
-      .then(res => {
-        if (res?.collected !== undefined) {
-          queryClient.setQueryData<PlayDetail>(
-            ['play-detail', videoId],
-            prev =>
-              prev && {
-                ...prev,
-                isCollected: res.collected,
-                collectionCount: prev.collectionCount + (res.collected ? 1 : -1)
-              }
-          );
-        }
-      })
-      .catch(() => {});
-  };
+  const { mutate: handleCollected } = useMutation({
+    mutationFn: () => toggleCollection(videoId),
+    onSuccess: res => {
+      queryClient.setQueryData<PlayDetail>(
+        ['play-detail', videoId],
+        prev =>
+          prev && {
+            ...prev,
+            isCollected: res.collected,
+            collectionCount: prev.collectionCount + (res.collected ? 1 : -1)
+          }
+      );
+    }
+  });
 
   const handleDanmuEmit = async (danmu: DanmakuItem): Promise<boolean> => {
     if (!videoId) return false;
