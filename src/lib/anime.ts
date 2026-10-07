@@ -11,4 +11,10 @@ const getStatusText = (item: { status: string; videoCount: number }) => {
 const getPlayText = (item: { videoCount: number }) =>
   item.videoCount ? '立即观看' : '即将开播';
 
-export { getStatusText, getPlayText };
+/** 评分展示：5 分制折算 10 分制，fixed 保留一位小数，无评分返回兜底文案 */
+const formatScore = (avgScore: number, fixed?: boolean) =>
+  avgScore > 0
+    ? `${fixed ? (avgScore * 2).toFixed(1) : avgScore * 2}分`
+    : '暂无评分';
+
+export { getStatusText, getPlayText, formatScore };

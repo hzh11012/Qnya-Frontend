@@ -38,6 +38,22 @@ const staticRoutes: RouteObject[] = [
         ]
       },
       {
+        path: '/anime/:videoId',
+        element: (
+          <RequireAuth>
+            <Outlet />
+          </RequireAuth>
+        ),
+        hydrateFallbackElement: <Fallback />,
+        errorElement: <Exception type='error' />,
+        children: [
+          {
+            index: true,
+            lazy: createLazyComponent(() => import('@/pages/anime/index'))
+          }
+        ]
+      },
+      {
         path: '/',
         Component: () => (
           <RequireAuth>

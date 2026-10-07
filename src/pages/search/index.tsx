@@ -2,7 +2,7 @@ import { searchAnime } from '@/apis/search';
 import Exception from '@/components/custom/exception';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   AnimeSearchCard,
@@ -39,7 +39,10 @@ const Index = () => {
   const list = query.data?.pages.flatMap(page => page.items) ?? [];
 
   // 番剧详情页尚未实现，点击暂不跳转
-  const handleAnimeClick = () => {};
+  const navigate = useNavigate();
+  const handleAnimeClick = (videoId: string) => {
+    if (videoId) navigate(`/anime/${videoId}`);
+  };
 
   const fetchMore = () => {
     if (query.hasNextPage && !query.isFetchingNextPage) {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Exception from '@/components/custom/exception';
@@ -66,7 +66,10 @@ const Index = () => {
   const detail = query.data;
 
   // 番剧详情页尚未实现，点击暂不跳转
-  const handleAnimeClick = () => {};
+  const navigate = useNavigate();
+  const handleAnimeClick = (videoId: string) => {
+    if (videoId) navigate(`/anime/${videoId}`);
+  };
 
   if (query.isPending) {
     return (

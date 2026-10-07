@@ -10,7 +10,7 @@ const NavItem = ({ link }: { link: (typeof links)[number] }) => {
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center cursor-pointer text-button-foreground gap-1',
+        'flex flex-col items-center justify-center cursor-pointer text-button-foreground gap-1 shrink-0',
         'transition-colors duration-200 text-muted-foreground hover:text-primary',
         {
           'text-primary': isActive
@@ -29,7 +29,7 @@ const NavItem = ({ link }: { link: (typeof links)[number] }) => {
 
 const Navbar = () => {
   return (
-    <nav className='flex flex-col items-center justify-around text-xs gap-6 py-8'>
+    <nav className='flex min-h-0 flex-1 flex-col items-center text-xs gap-6 py-8 overflow-y-auto scrollbar-hide'>
       {links.map((link, index) => (
         <NavItem
           key={index}

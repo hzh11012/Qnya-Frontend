@@ -34,6 +34,12 @@ export default defineConfig(() => ({
         target: 'http://127.0.0.1:3000',
         changeOrigin: true,
         ws: true
+      },
+      // 开发环境下代理视频/图片资源，绕过 s3 的 CORS 限制
+      '/s3': {
+        target: 'https://s3.qnets.cn',
+        changeOrigin: true,
+        rewrite: p => p.replace(/^\/s3/, '')
       }
     }
   }

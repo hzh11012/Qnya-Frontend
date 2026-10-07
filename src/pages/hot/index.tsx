@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useNavigate } from 'react-router-dom';
 import Exception from '@/components/custom/exception';
 import PageTitle from '@/components/custom/page-title';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,9 +30,13 @@ HotCardSkeleton.displayName = 'HotCardSkeleton';
 
 const HotCard: React.FC<{ item: HotAnimeItem }> = ({ item }) => {
   const { name, cover, description } = item;
+  const navigate = useNavigate();
 
   return (
-    <div className='w-full flex flex-col gap-2 cursor-pointer'>
+    <div
+      className='w-full flex flex-col gap-2 cursor-pointer'
+      onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
+    >
       <div className='group relative rounded-sm aspect-[3/4] overflow-hidden'>
         {/* 动画 inset 而非 transform scale：GPU 合成的 scale 会拉伸旧纹理导致过渡期模糊 */}
         <div className='absolute inset-0 transition-[inset] duration-200 group-hover:-inset-[2.5%]'>
