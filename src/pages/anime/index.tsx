@@ -129,6 +129,8 @@ const Anime: React.FC = () => {
 
   // 每部番剧首次加载详情时，若历史记录在其他集则自动跳过去（手动切集后不再触发）
   const jumpedAnimeRef = useRef('');
+  // 手动切集的目标集从头播放（不恢复历史进度），刷新页面后自动失效
+  const [manualVideoId, setManualVideoId] = useState<string | null>(null);
   useEffect(() => {
     if (!detail || jumpedAnimeRef.current === detail.animeId) return;
     jumpedAnimeRef.current = detail.animeId;
@@ -146,7 +148,10 @@ const Anime: React.FC = () => {
   }));
 
   const handleSelectVideo = (id: string) => {
-    if (id) navigate(`/anime/${id}`);
+    if (id) {
+      setManualVideoId(id);
+      navigate(`/anime/${id}`);
+    }
   };
 
   const invalidateDetail = () => {
@@ -230,7 +235,7 @@ const Anime: React.FC = () => {
         </div>
         <Player
           url={detail.video.url}
-          time={detail.time}
+          time={manualVideoId === videoId ? 0 : detail.time}
           danmaku={danmakus}
           onDanmuEmit={handleDanmuEmit}
           onIncrementPlay={incrementPlay}
