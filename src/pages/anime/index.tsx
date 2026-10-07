@@ -111,6 +111,7 @@ const Anime: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [collapsed, setCollapsed] = useState(false);
+  const playerRef = useRef<{ getTime: () => number } | null>(null);
 
   const { data: detail, isPending } = useQuery({
     queryKey: ['play-detail', videoId],
@@ -148,10 +149,11 @@ const Anime: React.FC = () => {
   }));
 
   const handleSelectVideo = (id: string) => {
-    if (id) {
-      setManualVideoId(id);
-      navigate(`/anime/${id}`);
-    }
+    if (!id) return;
+    // 切走前先保存当前集进度（点击时刻 videoId/时间还是上一集的）
+    persistProgress();
+    setManualVideoId(id);
+    navigate(`/anime/${id}`);
   };
 
   const invalidateDetail = () => {
@@ -162,9 +164,28 @@ const Anime: React.FC = () => {
     mutationFn: () => incrementPlayCount(videoId)
   });
 
-  const { mutate: saveProgress } = useMutation({
-    mutationFn: (time: number) => saveHistory(videoId, time)
-  });
+  /** 保存进度（静默失败），videoId 与 time 必须来自同一集 */
+  const persistProgress = () => {
+    const vid = playingVideoRef.current;
+    const t = playerRef.current?.getTime() ?? 0;
+    if (vid && t > 1) saveHistory(vid, t).catch(() => {});
+  };
+
+  // 播放器实际内容与 detail.video 同步，用它确定进度所属的集
+  // （keepPreviousData 期间路由 videoId 已变但播放的还是上一集）
+  const playingVideoRef = useRef<string | null>(null);
+  useEffect(() => {
+    playingVideoRef.current = detail?.video.id ?? null;
+  }, [detail]);
+
+  // 每 10s 心跳保存进度，刷新最多丢几秒；卸载时补存一次（SPA 内导航有效）
+  useEffect(() => {
+    const timer = setInterval(persistProgress, 10_000);
+    return () => {
+      clearInterval(timer);
+      persistProgress();
+    };
+  }, []);
 
   const { mutate: handleRating, isPending: ratingLoading } = useMutation({
     mutationFn: (data: RatingFormValues) =>
@@ -234,12 +255,12 @@ const Anime: React.FC = () => {
           {collapsed ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
         </div>
         <Player
+          ref={playerRef}
           url={detail.video.url}
           time={manualVideoId === videoId ? 0 : detail.time}
           danmaku={danmakus}
           onDanmuEmit={handleDanmuEmit}
           onIncrementPlay={incrementPlay}
-          onHistoryEmit={time => time > 1 && saveProgress(time)}
         />
       </div>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef } from 'react';
 import Artplayer from 'artplayer';
 import Hls from 'hls.js';
 import artplayerPluginHlsQualityRaw from 'artplayer-plugin-hls-quality';
@@ -20,7 +20,8 @@ interface PlayerProps {
   danmaku: DanmakuItem[];
   onDanmuEmit?: (danmu: DanmakuItem) => boolean | Promise<boolean>;
   onIncrementPlay?: () => void;
-  onHistoryEmit?: (time: number) => void;
+  /** React 19 ref prop：暴露 getTime() 供父组件定期保存进度 */
+  ref?: React.Ref<{ getTime: () => number }>;
 }
 
 const playVideo = (video: HTMLVideoElement, url: string, art: Artplayer) => {
@@ -55,11 +56,14 @@ const Player: React.FC<PlayerProps> = ({
   danmaku,
   onDanmuEmit,
   onIncrementPlay,
-  onHistoryEmit
+  ref
 }) => {
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const artRef = useRef<Artplayer | null>(null);
-  const lastTimeRef = useRef(0);
+
+  useImperativeHandle(ref, () => ({
+    getTime: () => artRef.current?.currentTime ?? 0
+  }));
 
   // 开发环境走 vite /s3 代理，绕过 s3 的 CORS 限制
   const safeUrl = import.meta.env.DEV
@@ -67,7 +71,7 @@ const Player: React.FC<PlayerProps> = ({
     : url;
 
   useEffect(() => {
-    if (!ref.current || artRef.current) return;
+    if (!containerRef.current || artRef.current) return;
 
     const art = new Artplayer({
       url: safeUrl,
@@ -91,7 +95,7 @@ const Player: React.FC<PlayerProps> = ({
       lock: true,
       isLive: false,
       fastForward: true,
-      container: ref.current!,
+      container: containerRef.current!,
       icons: {
         loading: '<img style="width: 150px;" src="/loading.gif">',
         state: '<img style="width: 80px;" src="/state.svg">'
@@ -122,18 +126,12 @@ const Player: React.FC<PlayerProps> = ({
       }
     };
 
-    const saveTime = () => {
-      lastTimeRef.current = art.currentTime;
-    };
-
     art.on('ready', seekTime);
-    art.on('video:timeupdate', saveTime);
 
     artRef.current = art;
 
     return () => {
       art.off('ready', seekTime);
-      art.off('video:timeupdate', saveTime);
       art.destroy(false);
       artRef.current = null;
     };
@@ -180,20 +178,6 @@ const Player: React.FC<PlayerProps> = ({
     };
   }, [onIncrementPlay, url]);
 
-  // 页面关闭/组件卸载时保存进度
-  useEffect(() => {
-    const save = () => {
-      onHistoryEmit?.(lastTimeRef.current);
-    };
-
-    window.addEventListener('beforeunload', save);
-
-    return () => {
-      window.removeEventListener('beforeunload', save);
-      save();
-    };
-  }, [onHistoryEmit]);
-
   // 弹幕列表更新后重新加载
   useEffect(() => {
     const art = artRef.current;
@@ -210,7 +194,7 @@ const Player: React.FC<PlayerProps> = ({
 
   return (
     <div
-      ref={ref}
+      ref={containerRef}
       className={cn(
         'w-full aspect-video mb-12 md:mb-0 md:aspect-auto md:h-[calc(100%-3rem)] lg:h-full',
         className
