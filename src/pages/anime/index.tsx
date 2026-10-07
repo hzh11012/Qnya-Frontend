@@ -128,17 +128,8 @@ const Anime: React.FC = () => {
     placeholderData: keepPreviousData
   });
 
-  // 每部番剧首次加载详情时，若历史记录在其他集则自动跳过去（手动切集后不再触发）
-  const jumpedAnimeRef = useRef('');
   // 手动切集的目标集从头播放（不恢复历史进度），刷新页面后自动失效
   const [manualVideoId, setManualVideoId] = useState<string | null>(null);
-  useEffect(() => {
-    if (!detail || jumpedAnimeRef.current === detail.animeId) return;
-    jumpedAnimeRef.current = detail.animeId;
-    if (detail.history && detail.history.videoId !== videoId) {
-      navigate(`/anime/${detail.history.videoId}`, { replace: true });
-    }
-  }, [detail, videoId, navigate]);
 
   /** 弹幕数据转 artplayer 插件结构 */
   const danmakus: DanmakuItem[] = (danmakuRes?.items ?? []).map(d => ({
