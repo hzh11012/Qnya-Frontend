@@ -156,7 +156,7 @@ const AnimeSearchCard: React.FC<AnimeSearchCardProps> = memo(
       <div className={cn('w-full flex gap-2 md:gap-4', className)}>
         <div
           className={cn(
-            'relative shrink-0 aspect-[3/4] overflow-hidden',
+            'relative rounded-sm shrink-0 aspect-[3/4] overflow-hidden',
             'md:cursor-pointer w-37 2xl:w-48',
             'transition-[width] duration-200'
           )}
