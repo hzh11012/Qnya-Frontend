@@ -14,7 +14,7 @@ const PAGE_SIZE = 20;
 
 /** 热门卡片网格：2→3→4→5→6→7 随宽度平滑过渡 */
 const HOT_GRID_CLASS =
-  'grid grid-cols-2 gap-x-4 gap-y-6 text-sm sm:grid-cols-3 md:grid-cols-4 md:gap-x-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
+  'grid grid-cols-3 gap-x-4 gap-y-6 text-sm md:grid-cols-4 md:gap-x-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
 
 const HotCardSkeleton: React.FC = () => {
   return (

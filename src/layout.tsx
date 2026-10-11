@@ -3,6 +3,8 @@ import { Outlet } from 'react-router-dom';
 import AppSidebar from '@/components/custom/sidebar/app-sidebar';
 import { HeaderInset, HeaderProvider } from '@/components/ui/header';
 import AppHeader from '@/components/custom/header/app-header';
+import AppFooter from '@/components/custom/sidebar/app-footer';
+import FloatingActions from '@/components/custom/floating-actions';
 
 const Layout = () => {
   return (
@@ -14,6 +16,8 @@ const Layout = () => {
           <HeaderInset className='md:max-w-441 md:mx-auto md:px-8 px-4 transition-[max-width,padding,margin] duration-200'>
             <Outlet />
           </HeaderInset>
+          <AppFooter />
+          <FloatingActions />
         </HeaderProvider>
       </SidebarInset>
     </SidebarProvider>
