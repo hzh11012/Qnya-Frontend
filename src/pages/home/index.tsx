@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChevronRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
 import { Button } from '@/components/ui/button';
 import { getHome } from '@/apis/home';
 import type { HomeTypeRow } from '@/apis/home';
+import { getGuessList } from '@/apis/anime';
+import { usePagedList } from '@/hooks/use-paged-list';
 import { getStatusText } from '@/lib/anime';
 import { formatProgress } from '@/lib/format';
 import { cn } from '@/lib/utils';
@@ -48,6 +51,84 @@ const getResponsiveClasses = (
     .map(([className]) => className);
 
   return cn(...conditionalClasses);
+};
+
+/** 猜你喜欢：每页条数与网格列数（断点与热门页一致） */
+const GUESS_PAGE_SIZE = 20;
+const GUESS_GRID_CLASS =
+  'grid grid-cols-3 gap-x-4 gap-y-6 text-sm md:grid-cols-4 md:gap-x-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
+
+/** 猜你喜欢随机种子：每会话生成一次，同一会话内分页顺序稳定，刷新会话换一批 */
+const getGuessSeed = () => {
+  const key = 'guess-seed';
+  let seed = sessionStorage.getItem(key);
+  if (!seed) {
+    seed = Math.random().toString(36).slice(2, 10);
+    sessionStorage.setItem(key, seed);
+  }
+  return seed;
+};
+
+/** 猜你喜欢：随机推荐列表，无限滚动加载，放在首页最底部 */
+const GuessSection: React.FC = () => {
+  const navigate = useNavigate();
+
+  const { list, fetchMore, isPending, isFetchingNextPage, hasNextPage } =
+    usePagedList({
+      queryKey: ['guess-list'],
+      fetchPage: page =>
+        getGuessList({
+          page,
+          pageSize: GUESS_PAGE_SIZE,
+          seed: getGuessSeed()
+        })
+    });
+
+  // 首次加载：骨架屏
+  if (isPending) {
+    return (
+      <HomeRow title='猜你喜欢'>
+        <div className={GUESS_GRID_CLASS}>
+          {Array.from({ length: 10 }, (_, i) => (
+            <AnimeCardSkeleton key={i} />
+          ))}
+        </div>
+      </HomeRow>
+    );
+  }
+
+  // 无数据：整块隐藏
+  if (!list.length) return null;
+
+  return (
+    <HomeRow title='猜你喜欢'>
+      <InfiniteScroll
+        // 组件默认给容器加内联 overflow: auto，避免撑出多余滚动条
+        style={{ overflow: 'visible' }}
+        dataLength={list.length}
+        next={fetchMore}
+        hasMore={!!hasNextPage}
+        loader={''}
+      >
+        <div className={GUESS_GRID_CLASS}>
+          {list.map(item => (
+            <AnimeCard
+              key={item.id}
+              title={item.name}
+              image={item.cover ?? ''}
+              remark={item.remark}
+              tip={getStatusText(item)}
+              onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
+            />
+          ))}
+          {isFetchingNextPage &&
+            Array.from({ length: 5 }, (_, i) => (
+              <AnimeCardSkeleton key={`skeleton-${i}`} />
+            ))}
+        </div>
+      </InfiniteScroll>
+    </HomeRow>
+  );
 };
 
 /** 行容器：标题 + 可选的查看全部按钮 + 卡片列表 */
@@ -174,6 +255,8 @@ const Index = () => {
           </div>
         </HomeRow>
       ))}
+      {/* 猜你喜欢：随机推荐 + 无限滚动，固定在页面最底部 */}
+      <GuessSection />
     </div>
   );
 };

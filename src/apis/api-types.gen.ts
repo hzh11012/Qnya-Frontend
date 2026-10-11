@@ -628,6 +628,14 @@ export interface paths {
                     status: 'ok' | 'error';
                     latency?: number;
                   };
+                  meilisearch: {
+                    /** @enum {string} */
+                    status: 'ok' | 'error';
+                    latency?: number;
+                    documents?: number;
+                    indexing?: boolean;
+                    inSync?: boolean;
+                  };
                 };
               };
             };
@@ -1569,6 +1577,13 @@ export interface paths {
                 tmdb: {
                   imageDomain: string;
                   apiDomain: string;
+                };
+                meilisearch: {
+                  host: string;
+                  /** @enum {string} */
+                  status: 'ok' | 'error';
+                  documents: number;
+                  inSync: boolean;
                 };
               };
             };
@@ -2697,6 +2712,77 @@ export interface paths {
         query?: {
           page?: number;
           pageSize?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                items: {
+                  /** Format: uuid */
+                  id: string;
+                  name: string;
+                  description: string;
+                  remark: string;
+                  cover: string;
+                  status: string;
+                  type: string;
+                  director: string;
+                  cv: string;
+                  year: number;
+                  month: string;
+                  tags: string[];
+                  avgScore: number;
+                  scoreCount: number;
+                  videoCount: number;
+                  /** Format: uuid */
+                  videoId: string | null;
+                  videos: {
+                    /** Format: uuid */
+                    id: string;
+                    episode: number;
+                  }[];
+                }[];
+                total: number;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/client/anime/guess': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          pageSize?: number;
+          seed?: string;
         };
         header?: never;
         path?: never;

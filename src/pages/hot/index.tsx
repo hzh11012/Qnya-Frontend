@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import Exception from '@/components/custom/exception';
@@ -7,6 +5,7 @@ import PageTitle from '@/components/custom/page-title';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getHotList } from '@/apis/hot';
 import type { HotAnimeItem } from '@/apis/hot';
+import { usePagedList } from '@/hooks/use-paged-list';
 import { getStatusText } from '@/lib/anime';
 import CoverImage from '@/components/custom/cover-image';
 
@@ -69,34 +68,13 @@ const HotCard: React.FC<{ item: HotAnimeItem }> = ({ item }) => {
 };
 
 const Index = () => {
-  const query = useInfiniteQuery({
-    queryKey: ['hot-list'],
-    queryFn: ({ pageParam }) =>
-      getHotList({ page: pageParam, pageSize: PAGE_SIZE }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      const fetched = allPages.reduce(
-        (sum, page) => sum + page.items.length,
-        0
-      );
-      return fetched < lastPage.total && lastPage.items.length > 0
-        ? allPages.length + 1
-        : undefined;
-    }
-  });
+  const { list, fetchMore, isPending, isFetchingNextPage, hasNextPage } =
+    usePagedList({
+      queryKey: ['hot-list'],
+      fetchPage: page => getHotList({ page, pageSize: PAGE_SIZE })
+    });
 
-  const list = useMemo(
-    () => query.data?.pages.flatMap(page => page.items) ?? [],
-    [query.data]
-  );
-
-  const fetchMore = () => {
-    if (query.hasNextPage && !query.isFetchingNextPage) {
-      query.fetchNextPage();
-    }
-  };
-
-  if (query.isPending) {
+  if (isPending) {
     return (
       <div className='my-4 md:my-8'>
         <PageTitle className='mb-3 md:mb-4'>热门动漫排行</PageTitle>
@@ -112,7 +90,6 @@ const Index = () => {
   if (!list.length) {
     return <Exception type='empty' />;
   }
-
   return (
     <div className='my-4 md:my-8 overflow-clip'>
       <PageTitle className='mb-3 md:mb-4'>热门动漫排行</PageTitle>
@@ -121,7 +98,7 @@ const Index = () => {
         style={{ overflow: 'visible' }}
         dataLength={list.length}
         next={fetchMore}
-        hasMore={!!query.hasNextPage}
+        hasMore={!!hasNextPage}
         loader={''}
       >
         <div className={HOT_GRID_CLASS}>
@@ -131,7 +108,7 @@ const Index = () => {
               item={item}
             />
           ))}
-          {query.isFetchingNextPage && (
+          {isFetchingNextPage && (
             <>
               <HotCardSkeleton />
               <HotCardSkeleton />
