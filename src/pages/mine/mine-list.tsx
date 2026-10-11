@@ -73,6 +73,8 @@ const GridScroll: React.FC<{
 export const MineCollection: React.FC = () => {
   const query = useInfiniteQuery({
     queryKey: ['mine-collections'],
+    // 覆盖全局 staleTime：播放页保存历史/追番后进入需拉取最新数据
+    staleTime: 0,
     queryFn: ({ pageParam }) =>
       getMyCollections({ page: pageParam, pageSize: 14 }),
     initialPageParam: 1,
@@ -124,6 +126,7 @@ const CollectionCard: React.FC<{ item: MineCollectionItem }> = ({ item }) => {
       type='vertical'
       title={item.name}
       image={item.cover}
+      remark={item.remark || undefined}
       tip={getStatusText(item)}
       onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
     />
@@ -134,6 +137,8 @@ const CollectionCard: React.FC<{ item: MineCollectionItem }> = ({ item }) => {
 export const MineHistory: React.FC = () => {
   const query = useInfiniteQuery({
     queryKey: ['mine-histories'],
+    // 覆盖全局 staleTime：播放页保存历史/追番后进入需拉取最新数据
+    staleTime: 0,
     queryFn: ({ pageParam }) =>
       getMyHistories({ page: pageParam, pageSize: 10 }),
     initialPageParam: 1,
@@ -192,7 +197,11 @@ const HistoryCard: React.FC<{ item: MineHistoryItem }> = ({ item }) => {
       }
       time={formatDate(item.watchedAt)}
       tip={item.time > 0 ? formatProgress(item.time) : undefined}
-      onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
+      // 携带本卡记录的进度：跳过 detail 缓存（30s staleTime），保证续播到最新位置
+      onClick={() =>
+        item.videoId &&
+        navigate(`/anime/${item.videoId}`, { state: { time: item.time } })
+      }
     />
   );
 };

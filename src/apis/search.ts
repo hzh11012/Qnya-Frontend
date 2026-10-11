@@ -19,6 +19,7 @@ interface SearchAnimeItem {
   id: string;
   name: string;
   description: string;
+  remark: string;
   cover: string;
   status: string;
   type: string;

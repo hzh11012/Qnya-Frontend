@@ -5,11 +5,18 @@ import FailAvatar from '@/components/custom/fail-avatar';
 interface CoverImageProps {
   src?: string | null;
   className?: string;
+  /** 仅在图片成功渲染时应用（如 hover 缩放类），失败兑底的 SVG 不响应 hover 效果 */
+  imageClassName?: string;
 }
 
-/** 封面图：加载失败或无图时兜底 base64 占位图 */
-const CoverImage: React.FC<CoverImageProps> = ({ src, className }) => {
+/** 封面图：加载失败或无图时兜底 base64 占位图；加载完成前隐藏避免裂图闪现 */
+const CoverImage: React.FC<CoverImageProps> = ({
+  src,
+  className,
+  imageClassName
+}) => {
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   if (!src || failed) {
     return <FailAvatar className={className} />;
@@ -22,7 +29,13 @@ const CoverImage: React.FC<CoverImageProps> = ({ src, className }) => {
       loading='lazy'
       draggable={false}
       onError={() => setFailed(true)}
-      className={cn('size-full object-cover', className)}
+      onLoad={() => setLoaded(true)}
+      className={cn(
+        'size-full object-cover transition-opacity duration-200',
+        loaded ? 'opacity-100' : 'opacity-0',
+        className,
+        imageClassName
+      )}
     />
   );
 };

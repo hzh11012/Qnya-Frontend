@@ -6,6 +6,7 @@ export interface MineCollectionItem {
   animeId: string;
   name: string;
   cover: string;
+  remark: string;
   status: 'upcoming' | 'airing' | 'completed';
   videoCount: number;
   avgScore: number;

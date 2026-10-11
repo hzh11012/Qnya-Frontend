@@ -19,7 +19,7 @@ const HOT_GRID_CLASS =
 const HotCardSkeleton: React.FC = () => {
   return (
     <div className='w-full flex flex-col gap-2'>
-      <Skeleton className='rounded-sm aspect-[3/4] w-full' />
+      <Skeleton className='rounded-sm aspect-3/4 w-full' />
       <Skeleton className='w-3/4 h-4 rounded-sm' />
       <Skeleton className='w-full h-3 rounded-sm' />
     </div>
@@ -29,36 +29,41 @@ const HotCardSkeleton: React.FC = () => {
 HotCardSkeleton.displayName = 'HotCardSkeleton';
 
 const HotCard: React.FC<{ item: HotAnimeItem }> = ({ item }) => {
-  const { name, cover, description } = item;
+  const { name, cover, remark } = item;
   const navigate = useNavigate();
 
   return (
-    <div
-      className='w-full flex flex-col gap-2 cursor-pointer'
-      onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
-    >
-      <div className='group relative rounded-sm aspect-[3/4] overflow-hidden'>
-        {/* 动画 inset 而非 transform scale：GPU 合成的 scale 会拉伸旧纹理导致过渡期模糊 */}
-        <div className='absolute inset-0 transition-[inset] duration-200 group-hover:-inset-[2.5%]'>
-          <CoverImage src={cover} />
-        </div>
+    <div className='w-full flex flex-col gap-2'>
+      <div
+        className='group relative aspect-3/4 cursor-pointer overflow-hidden rounded-sm'
+        onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
+      >
+        <CoverImage
+          src={cover}
+          className='absolute inset-0'
+          imageClassName='md:transition-[opacity,scale] md:duration-200 md:group-hover:scale-105'
+        />
         <div className='absolute inset-x-0 -bottom-0.5 h-10 bg-card-cover' />
         <div className='absolute bottom-1.5 right-2 text-white text-xs'>
           {getStatusText(item)}
         </div>
       </div>
       <div
-        className='text-sm text-foreground line-clamp-1 cursor-pointer hover:text-primary transition-[color] duration-200'
+        className='line-clamp-1 w-fit cursor-pointer text-sm text-foreground transition-[color] duration-200 hover:text-primary'
         title={name}
+        onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
       >
         {name}
       </div>
-      <div
-        className='text-xs text-muted-foreground line-clamp-1'
-        title={description}
-      >
-        {description}
-      </div>
+      {remark && (
+        <div
+          className='line-clamp-1 w-fit cursor-pointer text-xs text-muted-foreground transition-[color] duration-200 hover:text-primary'
+          title={remark}
+          onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
+        >
+          {remark}
+        </div>
+      )}
     </div>
   );
 };

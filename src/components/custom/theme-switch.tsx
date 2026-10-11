@@ -1,11 +1,6 @@
-import { useSyncExternalStore } from 'react';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/components/custom/theme-provider';
 import { Moon, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const emptySubscribe = () => () => {};
-const getClientSnapshot = () => true;
-const getServerSnapshot = () => false;
 
 interface ThemeSwitchProps {
   className?: string;
@@ -13,14 +8,6 @@ interface ThemeSwitchProps {
 
 const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ className }) => {
   const { resolvedTheme, setTheme } = useTheme();
-  const mounted = useSyncExternalStore(
-    emptySubscribe,
-    getClientSnapshot,
-    getServerSnapshot
-  );
-
-  if (!mounted) return null;
-
   const isDark = resolvedTheme === 'dark';
 
   return (

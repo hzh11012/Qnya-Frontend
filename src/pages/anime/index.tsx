@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   keepPreviousData,
   useQuery,
@@ -109,9 +109,21 @@ const AnimeDropdownMenu: React.FC<{ animeId: string }> = ({ animeId }) => {
 const Anime: React.FC = () => {
   const { videoId = '' } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [collapsed, setCollapsed] = useState(false);
   const playerRef = useRef<{ getTime: () => number } | null>(null);
+
+  // 历史卡续播：携带卡片时刻的进度（state 传递），避免 detail 缓存（全局 staleTime）
+  // 导致续播到上一次进入时的旧位置；仅对进入时那一集生效，用完即清
+  const [initialResume] = useState(() => {
+    const t = (location.state as { time?: number } | null)?.time;
+    return typeof t === 'number' && t > 1 ? { videoId, time: t } : null;
+  });
+  useEffect(() => {
+    if (location.state) navigate(location.pathname, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { data: detail, isPending } = useQuery({
     queryKey: ['play-detail', videoId],
@@ -156,9 +168,9 @@ const Anime: React.FC = () => {
   });
 
   /** 保存进度（静默失败），videoId 与 time 必须来自同一集 */
-  const persistProgress = () => {
+  const persistProgress = (time?: number) => {
     const vid = playingVideoRef.current;
-    const t = playerRef.current?.getTime() ?? 0;
+    const t = time ?? playerRef.current?.getTime() ?? 0;
     if (vid && t > 1) saveHistory(vid, t).catch(() => {});
   };
 
@@ -169,13 +181,11 @@ const Anime: React.FC = () => {
     playingVideoRef.current = detail?.video.id ?? null;
   }, [detail]);
 
-  // 每 10s 心跳保存进度，刷新最多丢几秒；卸载时补存一次（SPA 内导航有效）
+  // 每 10s 心跳保存进度，刷新最多丢几秒；卸载补存由 Player onUnmounted 回调触发
+  // （卸载时子组件 Player 先清理，ref 已不可用，不能再从 getTime 读）
   useEffect(() => {
     const timer = setInterval(persistProgress, 10_000);
-    return () => {
-      clearInterval(timer);
-      persistProgress();
-    };
+    return () => clearInterval(timer);
   }, []);
 
   const { mutate: handleRating, isPending: ratingLoading } = useMutation({
@@ -248,10 +258,17 @@ const Anime: React.FC = () => {
         <Player
           ref={playerRef}
           url={detail.video.url}
-          time={manualVideoId === videoId ? 0 : detail.time}
+          time={
+            manualVideoId === videoId
+              ? 0
+              : initialResume?.videoId === videoId
+                ? initialResume.time
+                : detail.time
+          }
           danmaku={danmakus}
           onDanmuEmit={handleDanmuEmit}
           onIncrementPlay={incrementPlay}
+          onUnmounted={persistProgress}
         />
       </div>
 

@@ -22,6 +22,8 @@ interface PlayerProps {
   onIncrementPlay?: () => void;
   /** React 19 ref prop：暴露 getTime() 供父组件定期保存进度 */
   ref?: React.Ref<{ getTime: () => number }>;
+  /** 播放器卸载时回调最后播放进度（秒）。卸载阶段 ref 已被置空，父组件需依赖此回调补存 */
+  onUnmounted?: (time: number) => void;
 }
 
 const playVideo = (video: HTMLVideoElement, url: string, art: Artplayer) => {
@@ -56,10 +58,17 @@ const Player: React.FC<PlayerProps> = ({
   danmaku,
   onDanmuEmit,
   onIncrementPlay,
+  onUnmounted,
   ref
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const artRef = useRef<Artplayer | null>(null);
+
+  // latest-ref：初始化 effect 闭包固定，回调用 ref 取最新
+  const onUnmountedRef = useRef(onUnmounted);
+  useEffect(() => {
+    onUnmountedRef.current = onUnmounted;
+  });
 
   useImperativeHandle(ref, () => ({
     getTime: () => artRef.current?.currentTime ?? 0
@@ -131,6 +140,8 @@ const Player: React.FC<PlayerProps> = ({
     artRef.current = art;
 
     return () => {
+      // 卸载顺序：子组件 cleanup 先于父组件，此刻还能读到进度，交给父组件补存
+      onUnmountedRef.current?.(artRef.current?.currentTime ?? 0);
       art.off('ready', seekTime);
       art.destroy(false);
       artRef.current = null;

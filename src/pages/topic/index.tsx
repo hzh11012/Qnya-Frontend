@@ -18,7 +18,7 @@ const TOPIC_GRID_CLASS =
 const TopicCardSkeleton: React.FC = () => {
   return (
     <div className='w-full flex flex-col gap-2'>
-      <Skeleton className='rounded-sm aspect-[16/9] w-full' />
+      <Skeleton className='rounded-sm aspect-video w-full' />
       <Skeleton className='w-2/3 h-4 rounded-sm' />
       <Skeleton className='w-full h-3 rounded-sm' />
     </div>
@@ -40,11 +40,12 @@ const TopicCard: React.FC<TopicCardProps> = ({ topic, onClick }) => {
       className='w-full flex flex-col gap-2 cursor-pointer'
       onClick={() => onClick(id)}
     >
-      <div className='group relative rounded-sm aspect-[16/9] overflow-hidden'>
-        {/* 动画 inset 而非 transform scale：GPU 合成的 scale 会拉伸旧纹理导致过渡期模糊 */}
-        <div className='absolute inset-0 transition-[inset] duration-200 group-hover:-inset-[2.5%]'>
-          <CoverImage src={cover} />
-        </div>
+      <div className='group relative rounded-sm aspect-video overflow-hidden'>
+        <CoverImage
+          src={cover}
+          className='absolute inset-0'
+          imageClassName='md:transition-[opacity,scale] md:duration-200 md:group-hover:scale-105'
+        />
         <div className='absolute inset-x-0 -bottom-0.5 h-10 bg-card-cover' />
         <div className='absolute bottom-1.5 right-2 text-white text-xs'>
           {animeCount} 个动漫

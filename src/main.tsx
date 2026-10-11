@@ -23,7 +23,6 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider
-        attribute='class'
         defaultTheme='system'
         storageKey='qnya-theme'
         disableTransitionOnChange

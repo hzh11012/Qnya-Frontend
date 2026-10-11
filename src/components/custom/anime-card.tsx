@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import FailAvatar from '@/components/custom/fail-avatar';
 import { cn } from '@/lib/utils';
 
 interface AnimeCardSkeletonProps {
@@ -16,7 +17,7 @@ const AnimeCardSkeleton: React.FC<AnimeCardSkeletonProps> = ({
       className={cn(
         'w-full',
         {
-          'max-w-[225px]': type === 'vertical',
+          'max-w-56.25': type === 'vertical',
           'max-w-[320px]': type === 'horizontal'
         },
         className
@@ -24,8 +25,8 @@ const AnimeCardSkeleton: React.FC<AnimeCardSkeletonProps> = ({
     >
       <Skeleton
         className={cn('relative rounded-sm', {
-          'aspect-[3/4]': type === 'vertical',
-          'aspect-[16/9]': type === 'horizontal'
+          'aspect-3/4': type === 'vertical',
+          'aspect-video': type === 'horizontal'
         })}
       />
       <Skeleton className='relative mt-2.5 h-5 w-full rounded-sm md:w-3/4' />
@@ -58,6 +59,9 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
   className,
   onClick
 }) => {
+  const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
   return (
     <div
       className={cn(
@@ -71,16 +75,31 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
     >
       <div
         className={cn(
-          'relative overflow-hidden rounded-sm bg-cover bg-center duration-200',
-          'md:cursor-pointer md:transition-[scale] md:hover:scale-105',
+          'group relative overflow-hidden rounded-sm bg-card md:cursor-pointer',
           {
-            'aspect-[3/4]': type === 'vertical',
-            'aspect-[16/9]': type === 'horizontal'
+            'aspect-3/4': type === 'vertical',
+            'aspect-video': type === 'horizontal'
           }
         )}
-        style={{ backgroundImage: `url("${image}")` }}
         onClick={onClick}
       >
+        {!image || failed ? (
+          <FailAvatar />
+        ) : (
+          <img
+            src={image}
+            alt=''
+            loading='lazy'
+            draggable={false}
+            onError={() => setFailed(true)}
+            onLoad={() => setLoaded(true)}
+            className={cn(
+              'absolute inset-0 size-full object-cover transition-[opacity,scale] duration-200',
+              'md:group-hover:scale-105',
+              loaded ? 'opacity-100' : 'opacity-0'
+            )}
+          />
+        )}
         {time && (
           <div className='absolute bottom-1 left-2 z-2 text-xs text-white'>
             {time}
