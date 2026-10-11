@@ -2486,6 +2486,7 @@ export interface paths {
                 /** @enum {string} */
                 role: 'admin' | 'premium' | 'user' | 'guest';
                 avatar: string | null;
+                r18: boolean;
               };
             };
           };
@@ -2532,6 +2533,7 @@ export interface paths {
                 /** @enum {string} */
                 role: 'admin' | 'premium' | 'user' | 'guest';
                 avatar: string | null;
+                r18: boolean;
               };
             };
           };
@@ -2631,6 +2633,7 @@ export interface paths {
                 /** @enum {string} */
                 role: 'admin' | 'premium' | 'user' | 'guest';
                 avatar: string | null;
+                r18: boolean;
               };
             };
           };
@@ -2795,6 +2798,77 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/client/home/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                collections: {
+                  /** Format: uuid */
+                  animeId: string;
+                  /** Format: uuid */
+                  videoId: string | null;
+                  name: string;
+                  cover: string | null;
+                  remark: string | null;
+                  /** @enum {string} */
+                  status: 'upcoming' | 'airing' | 'completed';
+                  videoCount: number;
+                  episode: number | null;
+                  time: number | null;
+                }[];
+                animeTypes: {
+                  /** @enum {string} */
+                  type: 'movie' | 'japanese' | 'american' | 'chinese' | 'adult';
+                  items: {
+                    /** Format: uuid */
+                    animeId: string;
+                    /** Format: uuid */
+                    videoId: string | null;
+                    name: string;
+                    cover: string | null;
+                    remark: string | null;
+                    /** @enum {string} */
+                    status: 'upcoming' | 'airing' | 'completed';
+                    videoCount: number;
+                  }[];
+                }[];
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
