@@ -14,7 +14,7 @@ const Mine: React.FC = () => {
         defaultValue='collections'
         className='size-full select-none'
       >
-        <TabsList className='w-full min-h-[3.125rem] justify-start gap-6 border-b border-border dark:border-border/60'>
+        <TabsList className='w-full min-h-12.5 justify-start gap-6 border-b border-border dark:border-border/60'>
           <TabsTrigger
             className='w-18 flex-none text-base after:inset-x-7'
             value='collections'

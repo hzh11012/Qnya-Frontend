@@ -18,7 +18,7 @@ const AnimeCardSkeleton: React.FC<AnimeCardSkeletonProps> = ({
         'w-full',
         {
           'max-w-56.25': type === 'vertical',
-          'max-w-[320px]': type === 'horizontal'
+          'max-w-80': type === 'horizontal'
         },
         className
       )}
@@ -67,15 +67,15 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
       className={cn(
         'w-full',
         {
-          'max-w-[225px]': type === 'vertical',
-          'max-w-[320px]': type === 'horizontal'
+          'max-w-56.25': type === 'vertical',
+          'max-w-80': type === 'horizontal'
         },
         className
       )}
     >
       <div
         className={cn(
-          'group relative overflow-hidden rounded-sm bg-card md:cursor-pointer',
+          'relative overflow-hidden rounded-sm bg-card transition-[scale] duration-200 md:cursor-pointer md:hover:scale-105',
           {
             'aspect-3/4': type === 'vertical',
             'aspect-video': type === 'horizontal'
@@ -86,19 +86,22 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
         {!image || failed ? (
           <FailAvatar />
         ) : (
-          <img
-            src={image}
-            alt=''
-            loading='lazy'
-            draggable={false}
-            onError={() => setFailed(true)}
-            onLoad={() => setLoaded(true)}
-            className={cn(
-              'absolute inset-0 size-full object-cover transition-[opacity,scale] duration-200',
-              'md:group-hover:scale-105',
-              loaded ? 'opacity-100' : 'opacity-0'
-            )}
-          />
+          <>
+            {/* 加载中占位：骨架屏脉冲，图片在上层淡入盖住 */}
+            {!loaded && <Skeleton className='absolute inset-0 size-full' />}
+            <img
+              src={image}
+              alt=''
+              loading='lazy'
+              draggable={false}
+              onError={() => setFailed(true)}
+              onLoad={() => setLoaded(true)}
+              className={cn(
+                'absolute inset-0 size-full object-cover transition-[opacity] duration-200',
+                loaded ? 'opacity-100' : 'opacity-0'
+              )}
+            />
+          </>
         )}
         {time && (
           <div className='absolute bottom-1 left-2 z-2 text-xs text-white'>

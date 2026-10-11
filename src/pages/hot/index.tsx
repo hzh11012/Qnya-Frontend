@@ -35,13 +35,13 @@ const HotCard: React.FC<{ item: HotAnimeItem }> = ({ item }) => {
   return (
     <div className='w-full flex flex-col gap-2'>
       <div
-        className='group relative aspect-3/4 cursor-pointer overflow-hidden rounded-sm'
+        className='relative aspect-3/4 cursor-pointer overflow-hidden rounded-sm transition-[scale] duration-200 md:hover:scale-105'
         onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
       >
         <CoverImage
           src={cover}
           className='absolute inset-0'
-          imageClassName='md:transition-[opacity,scale] md:duration-200 md:group-hover:scale-105'
+          imageClassName='md:transition-[opacity]'
         />
         <div className='absolute inset-x-0 -bottom-0.5 h-10 bg-card-cover' />
         <div className='absolute bottom-1.5 right-2 text-white text-xs'>

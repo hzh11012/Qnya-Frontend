@@ -40,11 +40,11 @@ const TopicCard: React.FC<TopicCardProps> = ({ topic, onClick }) => {
       className='w-full flex flex-col gap-2 cursor-pointer'
       onClick={() => onClick(id)}
     >
-      <div className='group relative rounded-sm aspect-video overflow-hidden'>
+      <div className='relative rounded-sm aspect-video overflow-hidden transition-[scale] duration-200 md:hover:scale-105'>
         <CoverImage
           src={cover}
           className='absolute inset-0'
-          imageClassName='md:transition-[opacity,scale] md:duration-200 md:group-hover:scale-105'
+          imageClassName='md:transition-[opacity]'
         />
         <div className='absolute inset-x-0 -bottom-0.5 h-10 bg-card-cover' />
         <div className='absolute bottom-1.5 right-2 text-white text-xs'>

@@ -55,7 +55,7 @@ const AnimeEpisode: React.FC<AnimeEpisodeProps> = ({
       </div>
       <div
         ref={containerRef}
-        className='max-h-[13.75rem] overflow-auto outline-none'
+        className='max-h-55 overflow-auto outline-none'
       >
         {list.map(item => {
           const isCurrent = item.episode === video.episode;
