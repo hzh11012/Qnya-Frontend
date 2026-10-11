@@ -18,7 +18,7 @@ export const ANIME_CARD_GRID_CLASS =
 
 interface VideoEpisodeProps {
   list: SearchAnimeItem['videos'];
-  onAnimeClick: (id: string) => void;
+  onAnimeClick: (id: string, opts?: { fixed?: boolean }) => void;
 }
 
 const VideoEpisode: React.FC<VideoEpisodeProps> = ({ list, onAnimeClick }) => {
@@ -67,7 +67,7 @@ const VideoEpisode: React.FC<VideoEpisodeProps> = ({ list, onAnimeClick }) => {
             variant='outline'
             className='size-8 shrink-0 p-0'
             disabled={id === ''}
-            onClick={() => onAnimeClick(id)}
+            onClick={() => onAnimeClick(id, { fixed: true })}
           >
             {episode}
           </Button>
@@ -128,7 +128,7 @@ interface AnimeSearchCardProps extends AnimeSearchCardSkeletonProps {
   scoreCount: number;
   avgScore: number;
   videos: SearchAnimeItem['videos'];
-  onAnimeClick: (id: string) => void;
+  onAnimeClick: (id: string, opts?: { fixed?: boolean }) => void;
 }
 
 const AnimeSearchCard: React.FC<AnimeSearchCardProps> = memo(

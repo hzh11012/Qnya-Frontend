@@ -40,8 +40,12 @@ const Index = () => {
 
   // 番剧详情页尚未实现，点击暂不跳转
   const navigate = useNavigate();
-  const handleAnimeClick = (videoId: string) => {
-    if (videoId) navigate(`/anime/${videoId}`);
+  const handleAnimeClick = (videoId: string, opts?: { fixed?: boolean }) => {
+    if (videoId)
+      navigate(`/anime/${videoId}`, {
+        // 集数列表点的是具体集：明确想看该集，播放页跳过历史续播跳转
+        state: opts?.fixed ? { fixed: true } : undefined
+      });
   };
 
   const fetchMore = () => {

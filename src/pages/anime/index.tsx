@@ -114,12 +114,14 @@ const Anime: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const playerRef = useRef<{ getTime: () => number } | null>(null);
 
-  // 历史卡续播：携带卡片时刻的进度（state 传递），避免 detail 缓存（全局 staleTime）
-  // 导致续播到上一次进入时的旧位置；仅对进入时那一集生效，用完即清
-  const [initialResume] = useState(() => {
-    const t = (location.state as { time?: number } | null)?.time;
-    return typeof t === 'number' && t > 1 ? { videoId, time: t } : null;
-  });
+  // 续播进度：从 location.state 渲染期派生（跳转时携带，避免 detail 缓存 30s 导致
+  // 续播到旧位置）。无明确集意图的入口（热门/专题/追番/搜索「立即观看」）在
+  // detail 返回后自动跳转到最后观看的集（见下方 effect）；
+  // 搜索集数列表点进的具体集带 fixed 标记，明确想看该集，跳过跳转
+  const [skipResume] = useState(
+    () => !!(location.state as { fixed?: boolean } | null)?.fixed
+  );
+  const resumeTime = (location.state as { time?: number } | null)?.time;
   useEffect(() => {
     if (location.state) navigate(location.pathname, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,6 +144,21 @@ const Anime: React.FC = () => {
 
   // 手动切集的目标集从头播放（不恢复历史进度），刷新页面后自动失效
   const [manualVideoId, setManualVideoId] = useState<string | null>(null);
+
+  // 无明确集意图的入口：若该番最后观看的不是当前集，跳转过去并恢复进度；
+  // 每次挂载最多跳一次（redirectedRef），避免跳转窗口内心跳保存造成来回跳
+  const redirectedRef = useRef(false);
+  useEffect(() => {
+    if (redirectedRef.current || !detail || manualVideoId || skipResume) return;
+    const history = detail.history;
+    if (history?.videoId && history.videoId !== videoId) {
+      redirectedRef.current = true;
+      navigate(`/anime/${history.videoId}`, {
+        state: history.time > 1 ? { time: history.time } : undefined,
+        replace: true
+      });
+    }
+  }, [detail, videoId, manualVideoId, skipResume, navigate]);
 
   /** 弹幕数据转 artplayer 插件结构 */
   const danmakus: DanmakuItem[] = (danmakuRes?.items ?? []).map(d => ({
@@ -261,8 +278,8 @@ const Anime: React.FC = () => {
           time={
             manualVideoId === videoId
               ? 0
-              : initialResume?.videoId === videoId
-                ? initialResume.time
+              : typeof resumeTime === 'number' && resumeTime > 1
+                ? resumeTime
                 : detail.time
           }
           danmaku={danmakus}
