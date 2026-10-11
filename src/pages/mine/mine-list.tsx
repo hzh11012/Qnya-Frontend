@@ -76,7 +76,7 @@ export const MineCollection: React.FC = () => {
     // 覆盖全局 staleTime：播放页保存历史/追番后进入需拉取最新数据
     staleTime: 0,
     queryFn: ({ pageParam }) =>
-      getMyCollections({ page: pageParam, pageSize: 14 }),
+      getMyCollections({ page: pageParam, pageSize: 20 }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) =>
       allPages.reduce((sum, p) => sum + p.items.length, 0) < lastPage.total
@@ -140,7 +140,7 @@ export const MineHistory: React.FC = () => {
     // 覆盖全局 staleTime：播放页保存历史/追番后进入需拉取最新数据
     staleTime: 0,
     queryFn: ({ pageParam }) =>
-      getMyHistories({ page: pageParam, pageSize: 10 }),
+      getMyHistories({ page: pageParam, pageSize: 20 }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) =>
       allPages.reduce((sum, p) => sum + p.items.length, 0) < lastPage.total

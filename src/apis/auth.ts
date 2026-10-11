@@ -1,13 +1,8 @@
 import request from '@/lib/request';
+import type { ApiResult } from './openapi';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: boolean;
-  avatar: string;
-}
+/** 当前登录用户（wire 类型来自后端 OpenAPI 文档） */
+export type User = ApiResult<'/api/auth/me', 'get'>;
 
 const me = async () => {
   return request.get<User>('/api/auth/me');
@@ -33,4 +28,4 @@ const logout = () => {
   return request.post('/api/auth/logout');
 };
 
-export { me, login, sendCode, logout, type User };
+export { me, login, sendCode, logout };

@@ -54,6 +54,7 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-destructive: var(--destructive);
   --color-ring: var(--primary);
   --color-input: var(--input);
@@ -89,6 +90,7 @@
   --muted: oklch(0.578 0.012 256.81); /** 占位符颜色、描述文字颜色 */
   --muted-foreground: oklch(0.578 0.012 256.81); /** 描述文字颜色 */
   --primary: oklch(0.585 0.233 277.117); /** 主颜色 */
+  --primary-foreground: oklch(0.985 0 0); /** 主颜色上的文字（白） */
   --destructive: oklch(0.671 0.213 24.709); /** 错误颜色 */
   --input: oklch(0.961 0.002 246.69); /** 输入框背景颜色 */
 
@@ -112,6 +114,7 @@
   --muted: oklch(0.681 0.012 256.816);
   --muted-foreground: oklch(0.681 0.012 256.816);
   --primary: oklch(0.673 0.182 276.935);
+  --primary-foreground: oklch(0.985 0 0); /** 主颜色上的文字（白） */
   --destructive: oklch(0.397 0.141 25.699);
   --input: oklch(0.262 0.006 236.684);
 

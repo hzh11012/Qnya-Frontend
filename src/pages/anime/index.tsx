@@ -14,6 +14,7 @@ import {
   saveHistory,
   toggleCollection,
   createRating,
+  type DanmakuData,
   type DanmakuItem,
   type PlayDetail
 } from '@/apis/play';
@@ -181,7 +182,14 @@ const Anime: React.FC = () => {
   };
 
   const { mutate: incrementPlay } = useMutation({
-    mutationFn: () => incrementPlayCount(videoId)
+    mutationFn: () => incrementPlayCount(videoId),
+    // 同步本地缓存，避免 staleTime 内播放数显示旧值
+    onSuccess: () => {
+      queryClient.setQueryData<PlayDetail>(
+        ['play-detail', videoId],
+        prev => prev && { ...prev, playCount: prev.playCount + 1 }
+      );
+    }
   });
 
   /** 保存进度（静默失败），videoId 与 time 必须来自同一集 */
@@ -231,13 +239,19 @@ const Anime: React.FC = () => {
 
   const handleDanmuEmit = async (danmu: DanmakuItem): Promise<boolean> => {
     if (!videoId) return false;
+    const data = {
+      text: danmu.text,
+      color: danmu.color!,
+      mode: toStorageMode(danmu.mode!),
+      time: danmu.time!
+    };
     try {
-      await danmakuCreate(videoId, {
-        text: danmu.text,
-        color: danmu.color!,
-        mode: toStorageMode(danmu.mode!),
-        time: danmu.time!
-      });
+      await danmakuCreate(videoId, data);
+      // 追加到本地缓存，避免 staleTime 内重进该集看不到刚发的弹幕
+      queryClient.setQueryData<{ items: DanmakuData[] }>(
+        ['danmakus', videoId],
+        prev => prev && { items: [...prev.items, data] }
+      );
       return true;
     } catch {
       return false;

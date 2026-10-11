@@ -9,7 +9,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 
 export default defineConfig(
-  { ignores: ['dist', 'node_modules', 'build'] },
+  { ignores: ['dist', 'node_modules', 'build', 'src/apis/api-types.gen.ts'] },
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {

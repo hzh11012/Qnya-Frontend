@@ -115,7 +115,7 @@ const MineCard: React.FC<MineCardProps> = ({ onEdit }) => {
           size='icon'
           title='退出'
           className={cn(
-            'text-muted-foreground hover:text-destructive',
+            'text-muted-foreground hover:text-primary',
             logoutMutation.isPending && 'pointer-events-none opacity-60'
           )}
           onClick={() => logoutMutation.mutate()}

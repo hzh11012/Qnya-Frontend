@@ -1,66 +1,31 @@
 import request from '@/lib/request';
+import type { ApiQuery, ApiResult } from './openapi';
 
-interface SearchSuggestQuery {
-  keyword: string;
-}
+/** 搜索联想条目（wire 类型来自后端 OpenAPI 文档） */
+export type SearchSuggestItem = ApiResult<
+  '/api/client/search/suggestions',
+  'get'
+>[number];
 
-interface SearchSuggestItem {
-  id: string;
-  name: string;
-  highlightName: string;
-}
+/** 搜索结果响应 */
+type SearchAnimeRes = ApiResult<'/api/client/search/', 'get'>;
 
-interface SearchAnimeQuery extends SearchSuggestQuery {
-  page?: number;
-  pageSize?: number;
-}
+export type SearchAnimeItem = SearchAnimeRes['items'][number];
 
-interface SearchAnimeItem {
-  id: string;
-  name: string;
-  description: string;
-  remark: string;
-  cover: string;
-  status: string;
-  type: string;
-  director: string;
-  cv: string;
-  year: number;
-  month: string;
-  tags: string[];
-  avgScore: number;
-  scoreCount: number;
-  videoCount: number;
-  videoId: string | null;
-  highlightName: string;
-  videos: {
-    id: string;
-    episode: number;
-  }[];
-}
-
-interface SearchAnimeRes {
-  items: SearchAnimeItem[];
-  total: number;
-}
-
-const searchSuggest = (params: SearchSuggestQuery) => {
+const searchSuggest = (
+  params: ApiQuery<'/api/client/search/suggestions', 'get'>
+) => {
   return request.get<SearchSuggestItem[]>('/api/client/search/suggestions', {
     params,
     showErrorToast: true
   });
 };
 
-const searchAnime = (params: SearchAnimeQuery) => {
+const searchAnime = (params: ApiQuery<'/api/client/search/', 'get'>) => {
   return request.get<SearchAnimeRes>('/api/client/search', {
     params,
     showErrorToast: true
   });
 };
 
-export {
-  searchSuggest,
-  searchAnime,
-  type SearchSuggestItem,
-  type SearchAnimeItem
-};
+export { searchSuggest, searchAnime };

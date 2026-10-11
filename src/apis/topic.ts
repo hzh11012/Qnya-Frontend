@@ -1,49 +1,17 @@
 import request from '@/lib/request';
+import type { ApiQuery, ApiResult } from './openapi';
 
-interface TopicItem {
-  id: string;
-  name: string;
-  description: string;
-  cover: string;
-  animeCount: number;
-}
+/** 专题列表响应（wire 类型来自后端 OpenAPI 文档） */
+type TopicListRes = ApiResult<'/api/client/topics/', 'get'>;
 
-interface TopicListRes {
-  items: TopicItem[];
-  total: number;
-}
+export type TopicItem = TopicListRes['items'][number];
 
-interface TopicAnimeItem {
-  id: string;
-  name: string;
-  description: string;
-  cover: string;
-  status: string;
-  type: string;
-  director: string;
-  cv: string;
-  year: number;
-  month: string;
-  tags: string[];
-  avgScore: number;
-  scoreCount: number;
-  videoCount: number;
-  videoId: string | null;
-  videos: {
-    id: string;
-    episode: number;
-  }[];
-}
+/** 专题详情响应 */
+type TopicDetailRes = ApiResult<'/api/client/topics/{id}', 'get'>;
 
-interface TopicDetailRes {
-  id: string;
-  name: string;
-  description: string;
-  cover: string;
-  anime: TopicAnimeItem[];
-}
+export type TopicAnimeItem = TopicDetailRes['anime'][number];
 
-const getTopicList = (params: { page?: number; pageSize?: number }) => {
+const getTopicList = (params: ApiQuery<'/api/client/topics/', 'get'>) => {
   return request.get<TopicListRes>('/api/client/topics', {
     params,
     showErrorToast: true
@@ -56,4 +24,4 @@ const getTopicDetail = (id: string) => {
   });
 };
 
-export { getTopicList, getTopicDetail, type TopicItem, type TopicAnimeItem };
+export { getTopicList, getTopicDetail };

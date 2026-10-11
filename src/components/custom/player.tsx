@@ -40,7 +40,6 @@ const playVideo = (video: HTMLVideoElement, url: string, art: Artplayer) => {
         });
       });
       withHls.hls = hls;
-      art.on('destroy', () => hls.destroy());
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = url;
     } else {
@@ -127,6 +126,11 @@ const Player: React.FC<PlayerProps> = ({
           beforeEmit: onDanmuEmit
         })
       ]
+    });
+
+    // 销毁时释放 hls.js 实例（切集只替换 withHls.hls，这里统一释放最新的）
+    art.on('destroy', () => {
+      (art as unknown as { hls?: Hls }).hls?.destroy();
     });
 
     const seekTime = () => {
