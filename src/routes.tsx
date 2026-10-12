@@ -9,6 +9,7 @@ import Fallback from '@/components/custom/fallback';
 import Layout from '@/layout';
 import {
   RequireAuth,
+  RequireRole,
   RedirectIfAuthenticated
 } from '@/components/custom/auth/auth-guard';
 import { AuthProvider } from '@/components/custom/auth/auth-provider';
@@ -39,10 +40,11 @@ const staticRoutes: RouteObject[] = [
       },
       {
         path: '/anime/:videoId',
+        // 播放页需普通用户及以上；未登录跳登录页，游客角色渲染 403 承载页
         element: (
-          <RequireAuth>
+          <RequireRole minRole='user'>
             <Outlet />
-          </RequireAuth>
+          </RequireRole>
         ),
         hydrateFallbackElement: <Fallback />,
         errorElement: <Exception type='error' />,
@@ -55,6 +57,7 @@ const staticRoutes: RouteObject[] = [
       },
       {
         path: '/',
+        // 前台整站需登录；未登录渲染 403 承载页（提供登录入口）
         Component: () => (
           <RequireAuth>
             <Layout />
@@ -87,6 +90,7 @@ const staticRoutes: RouteObject[] = [
           },
           {
             path: 'mine',
+            // 个人中心仅需登录（游客角色可看/改资料，追番/历史区块按角色隐藏）
             lazy: createLazyComponent(() => import('@/pages/mine/index'))
           },
           {

@@ -13,7 +13,7 @@ import { getStatusText } from '@/lib/anime';
 import { formatProgress } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
-/** 类型行标题映射（后端只返回有数据的类型，adult 需 r18 权限） */
+/** 类型行标题映射（后端只返回有数据的类型，adult 仅高级会员/管理员可见） */
 const TYPE_TITLE: Record<HomeTypeRow['type'], string> = {
   movie: '剧场版推荐',
   japanese: '日番推荐',

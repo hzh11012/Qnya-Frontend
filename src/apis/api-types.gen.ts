@@ -996,6 +996,90 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/admin/recommend/status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                /** Format: date-time */
+                lastRefreshedAt: string | null;
+                affinityCount: number;
+                animeCount: number;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/recommend/refresh': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/admin/resources/': {
     parameters: {
       query?: never;
@@ -2501,7 +2585,6 @@ export interface paths {
                 /** @enum {string} */
                 role: 'admin' | 'premium' | 'user' | 'guest';
                 avatar: string | null;
-                r18: boolean;
               };
             };
           };
@@ -2548,7 +2631,6 @@ export interface paths {
                 /** @enum {string} */
                 role: 'admin' | 'premium' | 'user' | 'guest';
                 avatar: string | null;
-                r18: boolean;
               };
             };
           };
@@ -2648,7 +2730,6 @@ export interface paths {
                 /** @enum {string} */
                 role: 'admin' | 'premium' | 'user' | 'guest';
                 avatar: string | null;
-                r18: boolean;
               };
             };
           };

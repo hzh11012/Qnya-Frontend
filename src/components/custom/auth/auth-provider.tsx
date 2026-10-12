@@ -21,7 +21,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // 清除用户状态
       setUser(null);
 
-      // 如果不在登录页，则重定向到登录页
+      // 会话失效：未在登录页时跳转登录页（携带回跳地址）
       if (location.pathname !== '/login') {
         const redirectPath = location.pathname + location.search;
         navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`, {

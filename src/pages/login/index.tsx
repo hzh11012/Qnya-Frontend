@@ -9,7 +9,6 @@ import { schema, type LoginFormValues } from '@/pages/login/form-schema';
 import { useAuthStore } from '@/store/auth';
 import CodeDialog from '@/pages/login/code-dialog';
 import Loading from '@/components/custom/loading';
-import { toast } from 'sonner';
 import {
   FlyDanmakuLayer,
   LoginBackground,
@@ -22,7 +21,6 @@ const Login: React.FC = () => {
   const { flies, onBackgroundClick } = useFlyDanmaku();
   const { open, setOpen, count, isDisable, handleSendCode, loading, onLogin } =
     useAuthLogin();
-  const setInitialized = useAuthStore(state => state.setInitialized);
   const setUser = useAuthStore(state => state.setUser);
 
   const form = useForm<LoginFormValues>({
@@ -40,13 +38,8 @@ const Login: React.FC = () => {
   ) => {
     try {
       const user = await onLogin(email, code);
-      if (user.role !== 'admin') {
-        toast.error('权限不足');
-        setCode('');
-        return;
-      }
+      // 前台对所有角色开放，角色差异由后端接口与页面守卫处理
       setUser(user);
-      setInitialized(true);
     } catch {
       setCode('');
     }
