@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Exception from '@/components/custom/exception';
 import PageTitle from '@/components/custom/page-title';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getHotList } from '@/apis/hot';
-import type { HotAnimeItem } from '@/apis/hot';
+import { getClientList } from '@/apis/anime';
+import type { ClientAnimeItem } from '@/apis/anime';
 import { usePagedList } from '@/hooks/use-paged-list';
 import { getStatusText } from '@/lib/anime';
 import CoverImage from '@/components/custom/cover-image';
@@ -27,7 +27,7 @@ const HotCardSkeleton: React.FC = () => {
 
 HotCardSkeleton.displayName = 'HotCardSkeleton';
 
-const HotCard: React.FC<{ item: HotAnimeItem }> = ({ item }) => {
+const HotCard: React.FC<{ item: ClientAnimeItem }> = ({ item }) => {
   const { name, cover, remark } = item;
   const navigate = useNavigate();
 
@@ -71,7 +71,8 @@ const Index = () => {
   const { list, fetchMore, isPending, isFetchingNextPage, hasNextPage } =
     usePagedList({
       queryKey: ['hot-list'],
-      fetchPage: page => getHotList({ page, pageSize: PAGE_SIZE })
+      // 热门 = 客户端列表的综合排序（score：评分人数 → 均分）
+      fetchPage: page => getClientList({ page, pageSize: PAGE_SIZE, sort: 1 })
     });
 
   if (isPending) {

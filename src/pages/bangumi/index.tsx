@@ -6,7 +6,7 @@ import Exception from '@/components/custom/exception';
 import PageTitle from '@/components/custom/page-title';
 import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
 import { getClientList, getClientTags } from '@/apis/anime';
-import type { BangumiAnimeItem } from '@/apis/anime';
+import type { ClientAnimeItem } from '@/apis/anime';
 import { usePagedList } from '@/hooks/use-paged-list';
 import { getStatusText } from '@/lib/anime';
 import { useAuthStore } from '@/store/auth';
@@ -240,7 +240,7 @@ const ListSkeleton: React.FC<{ count?: number }> = ({ count = 14 }) => (
 );
 
 /** 列表卡片 */
-const ListCard: React.FC<{ item: BangumiAnimeItem }> = ({ item }) => {
+const ListCard: React.FC<{ item: ClientAnimeItem }> = ({ item }) => {
   const navigate = useNavigate();
   return (
     <AnimeCard
@@ -261,7 +261,7 @@ const Bangumi: React.FC = () => {
   const { filter, handleChange } = useBangumiFilter();
 
   const { list, fetchMore, isPending, isFetchingNextPage, hasNextPage } =
-    usePagedList<BangumiAnimeItem>({
+    usePagedList<ClientAnimeItem>({
       queryKey: ['bangumi', 'list', filter],
       fetchPage: page =>
         getClientList({
