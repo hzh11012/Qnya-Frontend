@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Exception from '@/components/custom/exception';
-import PageTitle from '@/components/custom/page-title';
 import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
 import { getClientList, getClientTags } from '@/apis/anime';
 import type { ClientAnimeItem } from '@/apis/anime';
@@ -195,7 +194,7 @@ const BangumiSelect: React.FC<BangumiSelectProps> = ({ filter, onChange }) => {
   );
 
   return (
-    <div className='flex flex-col gap-2.5'>
+    <div className='mb-6 flex flex-col gap-2.5 md:mb-8'>
       <FilterRow
         options={SORT_LIST}
         value={filter.sort ?? ''}
@@ -278,8 +277,7 @@ const Bangumi: React.FC = () => {
     });
 
   return (
-    <div className='my-4 flex flex-col gap-6 md:my-8 md:gap-8'>
-      <PageTitle title='番剧' />
+    <div className='my-4 md:my-8'>
       <BangumiSelect
         filter={filter}
         onChange={handleChange}
