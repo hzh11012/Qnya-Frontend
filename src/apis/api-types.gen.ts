@@ -2922,6 +2922,129 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/client/anime/list': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          pageSize?: number;
+          type?: number;
+          status?: number;
+          year?: string;
+          month?: number;
+          tag?: string;
+          sort?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                items: {
+                  /** Format: uuid */
+                  id: string;
+                  name: string;
+                  description: string;
+                  remark: string;
+                  cover: string;
+                  status: string;
+                  type: string;
+                  director: string;
+                  cv: string;
+                  year: number;
+                  month: string;
+                  tags: string[];
+                  avgScore: number;
+                  scoreCount: number;
+                  videoCount: number;
+                  /** Format: uuid */
+                  videoId: string | null;
+                  videos: {
+                    /** Format: uuid */
+                    id: string;
+                    episode: number;
+                  }[];
+                }[];
+                total: number;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/client/anime/tags': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                items: {
+                  /** Format: uuid */
+                  id: string;
+                  name: string;
+                }[];
+                total: number;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/client/feedback/{animeId}': {
     parameters: {
       query?: never;

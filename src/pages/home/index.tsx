@@ -22,6 +22,15 @@ const TYPE_TITLE: Record<HomeTypeRow['type'], string> = {
   adult: '里番推荐'
 };
 
+/** 类型内部枚举 → 筛选页数字码（与后端 TYPE_CODE 映射一致） */
+const TYPE_CODE: Record<HomeTypeRow['type'], string> = {
+  movie: '1',
+  japanese: '2',
+  american: '3',
+  chinese: '4',
+  adult: '5'
+};
+
 /**
  * 首页单行卡片的降级显示：桌面 flex 一行排开（均分宽度），按 index
  * 在窄断点隐藏尾部卡片；移动端 grid 固定列数只显示前 N 个。
@@ -239,6 +248,8 @@ const Index = () => {
         <HomeRow
           key={row.type}
           title={TYPE_TITLE[row.type]}
+          showAll
+          onAllClick={() => navigate(`/bangumi?type=${TYPE_CODE[row.type]}`)}
         >
           <div className='grid grid-cols-3 gap-4 text-sm md:flex md:items-center md:gap-4'>
             {row.items.map((item, index) => (

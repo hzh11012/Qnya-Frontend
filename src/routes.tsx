@@ -89,6 +89,10 @@ const staticRoutes: RouteObject[] = [
             lazy: createLazyComponent(() => import('@/pages/hot/index'))
           },
           {
+            path: 'bangumi',
+            lazy: createLazyComponent(() => import('@/pages/bangumi/index'))
+          },
+          {
             path: 'mine',
             // 个人中心仅需登录（游客角色可看/改资料，追番/历史区块按角色隐藏）
             lazy: createLazyComponent(() => import('@/pages/mine/index'))
