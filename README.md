@@ -1,5 +1,8 @@
 # Qnya Frontend
 
+[![CI](https://github.com/hzh11012/Qnya-Frontend/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/hzh11012/Qnya-Frontend/actions/workflows/ci.yml)
+[![Release](https://github.com/hzh11012/Qnya-Frontend/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/hzh11012/Qnya-Frontend/actions/workflows/release.yml)
+
 Qnya 番剧平台客户端，面向访客与会员的番剧浏览、搜索与播放站点，支持移动端自适应与明暗主题。
 
 ## 页面模块
