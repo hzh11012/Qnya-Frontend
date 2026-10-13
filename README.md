@@ -21,6 +21,17 @@ Qnya 番剧平台客户端，面向访客与会员的番剧浏览、搜索与播
 - 成人内容仅 `premium` / `admin` 可见，普通用户不可见（接口层过滤，前端不渲染）。
 - 权限不足的整页展示 403 页面，局部无权限区块（如游客角色的追番/历史）直接隐藏。
 
+## 界面预览
+
+截图位于 [`docs/screenshots/`](docs/screenshots/)，运行 `pnpm screenshot` 可重新生成（自动登录前后台两端并批量截图，需三个服务在跑：前台 ：5000 / 后台 ：5900 / API :3000）。
+
+|                                           |                                        |
+| ----------------------------------------- | -------------------------------------- |
+| ![登录](docs/screenshots/login.png)       | ![首页](docs/screenshots/home.png)     |
+| ![番剧筛选](docs/screenshots/bangumi.png) | ![热门排行](docs/screenshots/hot.png)  |
+| ![专题](docs/screenshots/topic.png)       | ![我的追番](docs/screenshots/mine.png) |
+| ![播放页](docs/screenshots/anime.png)     |                                        |
+
 ## 技术栈
 
 | 类别     | 技术                                                          |
