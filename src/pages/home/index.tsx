@@ -41,31 +41,44 @@ const getResponsiveClasses = (
   index: number,
   type: 'horizontal' | 'vertical'
 ) => {
+  // 桌面 flex 行的隐藏阈值（全部限定在 md 以上区间，移动端 grid 不受影响）
   const breakpoints =
     type === 'vertical'
       ? ([
-          ['max-[855px]:hidden', 3],
-          ['max-[1100px]:hidden', 4],
-          ['max-[1300px]:hidden', 5],
-          ['max-[1500px]:hidden', 6]
+          ['min-[768px]:max-[855px]:hidden', 3],
+          ['min-[768px]:max-[1100px]:hidden', 4],
+          ['min-[768px]:max-[1300px]:hidden', 5],
+          ['min-[768px]:max-[1500px]:hidden', 6]
         ] as const)
       : ([
-          ['max-[855px]:hidden', 2],
-          ['max-[1140px]:hidden', 3],
-          ['max-[1500px]:hidden', 4]
+          ['min-[768px]:max-[855px]:hidden', 2],
+          ['min-[768px]:max-[1140px]:hidden', 3],
+          ['min-[768px]:max-[1500px]:hidden', 4]
         ] as const);
 
   const conditionalClasses = breakpoints
     .filter(([, threshold]) => index >= threshold)
     .map(([className]) => className);
 
-  return cn(...conditionalClasses);
+  // 移动端 grid 展示两行：类型行 3×2 取 6 张、追番行 2×2 取 4 张，多余的一张隐藏
+  const mobileHidden =
+    (type === 'vertical' && index === 6) ||
+    (type === 'horizontal' && index === 4)
+      ? 'max-md:hidden'
+      : '';
+
+  // 768-855px：grid 刚切到 flex、可见卡片少，均分伸展撑满整行（与相邻 grid 行为衔接）
+  return cn(
+    ...conditionalClasses,
+    mobileHidden,
+    'min-[768px]:max-[855px]:flex-1 min-[768px]:max-[855px]:max-w-none'
+  );
 };
 
 /** 猜你喜欢：每页条数与网格列数（断点与热门页一致） */
 const GUESS_PAGE_SIZE = 20;
 const GUESS_GRID_CLASS =
-  'grid grid-cols-3 gap-x-4 gap-y-6 text-sm md:grid-cols-4 md:gap-x-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
+  'grid grid-cols-3 justify-items-center gap-x-4 gap-y-6 text-sm md:grid-cols-4 md:gap-x-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
 
 /** 猜你喜欢随机种子：每会话生成一次，同一会话内分页顺序稳定，刷新会话换一批 */
 const getGuessSeed = () => {
@@ -172,11 +185,12 @@ const HomeSkeleton: React.FC = () => (
       title='我的追番'
       showAll
     >
-      <div className='grid grid-cols-2 gap-4 text-sm md:flex md:items-center md:gap-4'>
+      <div className='grid grid-cols-2 gap-4 text-sm md:flex md:items-center md:gap-6'>
         {Array.from({ length: 5 }, (_, i) => (
           <AnimeCardSkeleton
             key={i}
             type='horizontal'
+            className={getResponsiveClasses(i, 'horizontal')}
           />
         ))}
       </div>
@@ -186,11 +200,12 @@ const HomeSkeleton: React.FC = () => (
         key={row}
         title='加载中'
       >
-        <div className='grid grid-cols-3 gap-4 text-sm md:flex md:items-center md:gap-4'>
+        <div className='grid grid-cols-3 gap-4 text-sm md:flex md:items-center md:gap-6'>
           {Array.from({ length: 7 }, (_, i) => (
             <AnimeCardSkeleton
               key={i}
               type='vertical'
+              className={getResponsiveClasses(i, 'vertical')}
             />
           ))}
         </div>
@@ -222,7 +237,7 @@ const Index = () => {
           showAll
           onAllClick={() => navigate('/mine')}
         >
-          <div className='grid grid-cols-2 gap-4 text-sm md:flex md:items-center md:gap-4'>
+          <div className='grid grid-cols-2 gap-4 text-sm md:flex md:items-center md:gap-6'>
             {data.collections.map((item, index) => (
               <AnimeCard
                 key={item.animeId}
@@ -251,7 +266,7 @@ const Index = () => {
           showAll
           onAllClick={() => navigate(`/bangumi?type=${TYPE_CODE[row.type]}`)}
         >
-          <div className='grid grid-cols-3 gap-4 text-sm md:flex md:items-center md:gap-4'>
+          <div className='grid grid-cols-3 gap-4 text-sm md:flex md:items-center md:gap-6'>
             {row.items.map((item, index) => (
               <AnimeCard
                 key={item.animeId}

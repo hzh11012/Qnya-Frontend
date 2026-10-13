@@ -17,8 +17,9 @@ const AnimeCardSkeleton: React.FC<AnimeCardSkeletonProps> = ({
       className={cn(
         'w-full',
         {
-          'max-w-56.25': type === 'vertical',
-          'max-w-80': type === 'horizontal'
+          // 移动端 grid 列宽可能超过上限，放开以保证撑满
+          'max-w-56.25 max-md:max-w-none': type === 'vertical',
+          'max-w-80 max-md:max-w-none': type === 'horizontal'
         },
         className
       )}
@@ -67,8 +68,9 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
       className={cn(
         'w-full',
         {
-          'max-w-56.25': type === 'vertical',
-          'max-w-80': type === 'horizontal'
+          // 移动端 grid 列宽可能超过上限，放开以保证撑满
+          'max-w-56.25 max-md:max-w-none': type === 'vertical',
+          'max-w-80 max-md:max-w-none': type === 'horizontal'
         },
         className
       )}
