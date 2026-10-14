@@ -34,7 +34,7 @@ export const useAuthLogin = () => {
   const loading = sendCodeMutation.isPending;
 
   const handleSendCode = useCallback(
-    (email: string) => {
+    async (email: string) => {
       const emailChanged = lastSentEmailRef.current !== email;
       if (emailChanged) {
         reset();
@@ -42,8 +42,13 @@ export const useAuthLogin = () => {
       if (!isDisable || emailChanged) {
         // 请求进行中直接忽略，防止连点重复发送验证码
         if (!sendCodeMutation.isPending) {
-          sendCodeMutation.mutate(email);
           lastSentEmailRef.current = email;
+          // 发送成功才打开验证码弹窗；失败时请求层已 toast，停留在登录页
+          const sent = await sendCodeMutation.mutateAsync(email).then(
+            () => true,
+            () => false
+          );
+          if (!sent) return;
         }
       }
       setOpen(true);
