@@ -13,7 +13,7 @@ const PAGE_SIZE = 20;
 
 /** 专题卡片网格：2→3→4→5 随宽度平滑过渡 */
 const TOPIC_GRID_CLASS =
-  'grid grid-cols-2 gap-x-4 gap-y-6 text-sm md:gap-x-6 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5';
+  'grid grid-cols-2 gap-x-4 gap-y-6 text-sm md:grid-cols-3 md:gap-x-6 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6';
 
 const TopicCardSkeleton: React.FC = () => {
   return (

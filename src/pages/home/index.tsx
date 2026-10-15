@@ -31,48 +31,50 @@ const TYPE_CODE: Record<HomeTypeRow['type'], string> = {
   adult: '5'
 };
 
+/** 追番行网格：横版卡片宽一档，列数比类型推荐少一（3/4/5/6），断点与猜你喜欢一致 */
+const FOLLOW_GRID_CLASS =
+  'grid grid-cols-2 justify-items-center gap-4 text-sm md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6';
+
+/** 类型推荐行网格：列数梯度与猜你喜欢（GUESS_GRID_CLASS）完全一致 */
+const TYPE_GRID_CLASS =
+  'grid grid-cols-3 justify-items-center gap-4 text-sm md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
+
 /**
- * 首页单行卡片的降级显示：桌面 flex 一行排开（均分宽度），按 index
- * 在窄断点隐藏尾部卡片；移动端 grid 固定列数只显示前 N 个。
- * 断点与「我的追番」列表网格一致（855/1100/1300/1500）。
+ * 首页单行卡片的降级显示：全程网格布局，列数随标准断点（md/lg/xl/2xl）增加、
+ * 卡片随列宽拉伸；数据不足时保持固定列数（与「猜你喜欢」行为一致）。
+ * 按 index 在各断点隐藏超出列数的尾部卡片，保证单行展示；
+ * 移动端 grid 展示两行：类型行 3×2 取 6 张、追番行 2×2 取 4 张，多余的一张隐藏。
+ * 隐藏阈值与 FOLLOW_GRID_CLASS/TYPE_GRID_CLASS 的列数断点一一对应。
  * 注意：完整类名必须字面量出现在源码中，否则 Tailwind 不会生成对应 CSS。
  */
 const getResponsiveClasses = (
   index: number,
   type: 'horizontal' | 'vertical'
 ) => {
-  // 桌面 flex 行的隐藏阈值（全部限定在 md 以上区间，移动端 grid 不受影响）
   const breakpoints =
     type === 'vertical'
       ? ([
-          ['min-[768px]:max-[855px]:hidden', 3],
-          ['min-[768px]:max-[1100px]:hidden', 4],
-          ['min-[768px]:max-[1300px]:hidden', 5],
-          ['min-[768px]:max-[1500px]:hidden', 6]
+          ['md:max-lg:hidden', 4],
+          ['lg:max-xl:hidden', 5],
+          ['xl:max-2xl:hidden', 6]
         ] as const)
       : ([
-          ['min-[768px]:max-[855px]:hidden', 2],
-          ['min-[768px]:max-[1140px]:hidden', 3],
-          ['min-[768px]:max-[1500px]:hidden', 4]
+          ['md:max-lg:hidden', 3],
+          ['lg:max-xl:hidden', 4],
+          ['xl:max-2xl:hidden', 5]
         ] as const);
 
   const conditionalClasses = breakpoints
     .filter(([, threshold]) => index >= threshold)
     .map(([className]) => className);
 
-  // 移动端 grid 展示两行：类型行 3×2 取 6 张、追番行 2×2 取 4 张，多余的一张隐藏
   const mobileHidden =
     (type === 'vertical' && index === 6) ||
     (type === 'horizontal' && index === 4)
       ? 'max-md:hidden'
       : '';
 
-  // 768-855px：grid 刚切到 flex、可见卡片少，均分伸展撑满整行（与相邻 grid 行为衔接）
-  return cn(
-    ...conditionalClasses,
-    mobileHidden,
-    'min-[768px]:max-[855px]:flex-1 min-[768px]:max-[855px]:max-w-none'
-  );
+  return cn(...conditionalClasses, mobileHidden);
 };
 
 /** 猜你喜欢：每页条数与网格列数（断点与热门页一致） */
@@ -185,8 +187,8 @@ const HomeSkeleton: React.FC = () => (
       title='我的追番'
       showAll
     >
-      <div className='grid grid-cols-2 gap-4 text-sm md:flex md:items-center md:gap-6'>
-        {Array.from({ length: 5 }, (_, i) => (
+      <div className={FOLLOW_GRID_CLASS}>
+        {Array.from({ length: 6 }, (_, i) => (
           <AnimeCardSkeleton
             key={i}
             type='horizontal'
@@ -200,7 +202,7 @@ const HomeSkeleton: React.FC = () => (
         key={row}
         title='加载中'
       >
-        <div className='grid grid-cols-3 gap-4 text-sm md:flex md:items-center md:gap-6'>
+        <div className={TYPE_GRID_CLASS}>
           {Array.from({ length: 7 }, (_, i) => (
             <AnimeCardSkeleton
               key={i}
@@ -237,8 +239,8 @@ const Index = () => {
           showAll
           onAllClick={() => navigate('/mine')}
         >
-          <div className='grid grid-cols-2 gap-4 text-sm md:flex md:items-center md:gap-6'>
-            {data.collections.map((item, index) => (
+          <div className={FOLLOW_GRID_CLASS}>
+            {data.collections.slice(0, 6).map((item, index) => (
               <AnimeCard
                 key={item.animeId}
                 type='horizontal'
@@ -266,8 +268,8 @@ const Index = () => {
           showAll
           onAllClick={() => navigate(`/bangumi?type=${TYPE_CODE[row.type]}`)}
         >
-          <div className='grid grid-cols-3 gap-4 text-sm md:flex md:items-center md:gap-6'>
-            {row.items.map((item, index) => (
+          <div className={TYPE_GRID_CLASS}>
+            {row.items.slice(0, 7).map((item, index) => (
               <AnimeCard
                 key={item.animeId}
                 className={getResponsiveClasses(index, 'vertical')}

@@ -11,28 +11,14 @@ import {
 } from '@/apis/mine';
 import { formatProgress, formatDate } from '@/lib/format';
 import { getStatusText } from '@/lib/anime';
-import { cn } from '@/lib/utils';
 
-/** 追番网格（7 列随宽度降级） */
-const COLLECTION_GRID_CLASS = cn(
-  'grid gap-4 grid-cols-7 text-sm',
-  'md:gap-6',
-  'max-[1500px]:grid-cols-6',
-  'max-[1300px]:grid-cols-5',
-  'max-[1100px]:grid-cols-4',
-  'max-[855px]:grid-cols-3',
-  'max-md:grid-cols-3'
-);
+/** 追番网格（竖版卡）：列数梯度与首页推荐/猜你喜欢一致（标准断点） */
+const COLLECTION_GRID_CLASS =
+  'grid gap-4 grid-cols-3 text-sm md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
 
-/** 历史网格（横向卡，5 列随宽度降级） */
-const HISTORY_GRID_CLASS = cn(
-  'grid gap-4 grid-cols-5 text-sm',
-  'md:gap-6',
-  'max-[1500px]:grid-cols-4',
-  'max-[1140px]:grid-cols-3',
-  'max-[855px]:grid-cols-2',
-  'max-md:grid-cols-2'
-);
+/** 历史网格（横向卡）：列数梯度与首页我的追番一致（标准断点） */
+const HISTORY_GRID_CLASS =
+  'grid gap-4 grid-cols-2 text-sm md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6';
 
 /** 网格 + 无限滚动容器（骨架卡随网格占位） */
 const GridScroll: React.FC<{

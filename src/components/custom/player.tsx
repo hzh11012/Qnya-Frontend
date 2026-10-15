@@ -211,7 +211,9 @@ const Player: React.FC<PlayerProps> = ({
     <div
       ref={containerRef}
       className={cn(
-        'w-full aspect-video mb-12 md:mb-0 md:aspect-auto md:h-[calc(100%-3rem)] lg:h-full',
+        // lg 以下父容器高度自适应，必须用 aspect-video 撑起高度；
+        // md~lg 段若提前切 aspect-auto + 百分比高度，对 auto 父级解析不出，播放器会隐藏
+        'w-full aspect-video mb-12 lg:mb-0 lg:aspect-auto lg:h-full',
         className
       )}
     ></div>
