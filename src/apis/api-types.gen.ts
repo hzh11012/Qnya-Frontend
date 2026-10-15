@@ -3057,11 +3057,11 @@ export interface paths {
                   /** Format: uuid */
                   videoId: string | null;
                   name: string;
-                  cover: string | null;
                   remark: string | null;
                   /** @enum {string} */
                   status: 'upcoming' | 'airing' | 'completed';
                   videoCount: number;
+                  banner: string | null;
                   episode: number | null;
                   time: number | null;
                 }[];

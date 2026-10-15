@@ -246,7 +246,7 @@ const Index = () => {
                 type='horizontal'
                 className={getResponsiveClasses(index, 'horizontal')}
                 title={item.name}
-                image={item.cover ?? ''}
+                image={item.banner ?? ''}
                 tip={getStatusText(item)}
                 remark={
                   item.episode
