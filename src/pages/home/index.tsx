@@ -221,11 +221,16 @@ const Index = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['home'],
     queryFn: getHome,
-    staleTime: 30_000
+    // 覆盖全局 staleTime：播放页保存进度/追番后返回需拉取最新数据
+    staleTime: 0
   });
 
-  const handleAnimeClick = (videoId: string | null) => {
-    if (videoId) navigate(`/anime/${videoId}`);
+  const handleAnimeClick = (videoId: string | null, time?: number | null) => {
+    if (videoId)
+      navigate(`/anime/${videoId}`, {
+        // 携带追番进度：跳过播放详情 30s 缓存，保证续播到最新位置
+        state: time && time > 1 ? { time } : undefined
+      });
   };
 
   if (isLoading || !data) return <HomeSkeleton />;
@@ -253,7 +258,7 @@ const Index = () => {
                     ? `看到第${item.episode}话 ${formatProgress(item.time ?? 0)}`
                     : '尚未观看'
                 }
-                onClick={() => handleAnimeClick(item.videoId)}
+                onClick={() => handleAnimeClick(item.videoId, item.time)}
               />
             ))}
           </div>
