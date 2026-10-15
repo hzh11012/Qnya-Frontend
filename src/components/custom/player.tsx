@@ -113,12 +113,18 @@ const Player: React.FC<PlayerProps> = ({
       },
       theme: 'var(--primary)',
       plugins: [
-        artplayerPluginHlsQuality({
-          control: true,
-          setting: false,
-          getResolution: level => level.height + 'p',
-          title: '画质'
-        }),
+        // 画质插件依赖 art.hls，仅 m3u8 源注册（mp4 源会在 ready/restart 抽出异常，
+        // 且异常会打断同事件的后续 handler，导致 seekTime 恢复进度失效）
+        ...(url.includes('.m3u8')
+          ? [
+              artplayerPluginHlsQuality({
+                control: true,
+                setting: false,
+                getResolution: level => level.height + 'p',
+                title: '画质'
+              })
+            ]
+          : []),
         artplayerPluginDanmuku({
           width: 644,
           emitter: true,
