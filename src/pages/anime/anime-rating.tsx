@@ -94,7 +94,7 @@ const AnimeRating: React.FC<AnimeRatingProps> = ({
                       {['1', '2', '3', '4', '5'].map(value => (
                         <label
                           key={value}
-                          className='relative cursor-pointer rounded px-0.5 outline-none'
+                          className='relative cursor-pointer rounded-sm px-0.5 outline-none'
                           onMouseEnter={() => setHoverRating(value)}
                           onMouseLeave={() => setHoverRating('')}
                         >

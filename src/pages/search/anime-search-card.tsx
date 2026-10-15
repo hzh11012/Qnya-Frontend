@@ -168,7 +168,7 @@ const AnimeSearchCard: React.FC<AnimeSearchCardProps> = memo(
           />
           <div
             className={cn(
-              'absolute top-3 right-0 text-white text-xs bg-primary pl-2 pr-1.5 py-0.5 rounded-l-lg'
+              'absolute top-3 right-0 text-white text-xs bg-primary pl-2 pr-1.5 py-0.5 rounded-l-sm'
             )}
           >
             {typeLabel(type)}
