@@ -192,11 +192,26 @@ const Anime: React.FC = () => {
     }
   });
 
-  /** 保存进度（静默失败），videoId 与 time 必须来自同一集 */
+  /** 保存进度（静默失败），videoId 与 time 必须来自同一集；定时心跳用，不动缓存 */
   const persistProgress = (time?: number) => {
     const vid = playingVideoRef.current;
     const t = time ?? playerRef.current?.getTime() ?? 0;
     if (vid && t > 1) saveHistory(vid, t).catch(() => {});
+  };
+
+  /** 卸载补存：落库后失效依赖进度的缓存，消除「返回列表页时 GET 先于 POST 入库」
+   * 的竞态（已挂载的页面立即重取，未挂载的标记 stale，挂载时拉到新数据） */
+  const flushProgress = (time: number) => {
+    const vid = playingVideoRef.current;
+    if (!vid || time <= 1) return;
+    saveHistory(vid, time)
+      .catch(() => {})
+      .finally(() => {
+        void queryClient.invalidateQueries({ queryKey: ['play-detail'] });
+        void queryClient.invalidateQueries({ queryKey: ['home'] });
+        void queryClient.invalidateQueries({ queryKey: ['mine-collections'] });
+        void queryClient.invalidateQueries({ queryKey: ['mine-histories'] });
+      });
   };
 
   // 播放器实际内容与 detail.video 同步，用它确定进度所属的集
@@ -299,7 +314,7 @@ const Anime: React.FC = () => {
           danmaku={danmakus}
           onDanmuEmit={handleDanmuEmit}
           onIncrementPlay={incrementPlay}
-          onUnmounted={persistProgress}
+          onUnmounted={flushProgress}
         />
       </div>
 
