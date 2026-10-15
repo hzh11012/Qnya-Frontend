@@ -104,7 +104,8 @@ const AnimeDescription: React.FC<AnimeDescriptionProps> = ({
       </div>
       <div
         className={cn(
-          'line-clamp-2 text-xs mt-2 text-muted-foreground',
+          // whitespace-pre-line 保留后台录入的换行
+          'line-clamp-2 text-xs mt-2 text-muted-foreground whitespace-pre-line',
           'data-[open=true]:line-clamp-none'
         )}
         data-open={open}
