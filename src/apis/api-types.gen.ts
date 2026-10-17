@@ -3275,6 +3275,7 @@ export interface paths {
                 } | null;
                 time: number;
                 isCollected: boolean;
+                seriesName: string;
                 isRating: boolean;
                 series: {
                   /** Format: uuid */

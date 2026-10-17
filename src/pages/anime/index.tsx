@@ -344,7 +344,7 @@ const Anime: React.FC = () => {
               <hr className='my-5 border-border' />
             </div>
             <AnimeSideList
-              title={`${detail.name}系列`}
+              title={detail.seriesName}
               list={detail.series}
               onAnimeClick={handleSelectVideo}
               className='-my-2'
