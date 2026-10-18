@@ -201,7 +201,9 @@ const AnimeSearchCard: React.FC<AnimeSearchCardProps> = memo(
               导演：{director}；声优：{cv}
             </div>
             <div
-              className={cn('text-muted-foreground line-clamp-3')}
+              className={cn(
+                'text-muted-foreground line-clamp-3 whitespace-pre-line'
+              )}
               title={description}
             >
               简介：{description}
