@@ -6,9 +6,9 @@ import type { PlayDetail } from '@/apis/play';
 import { ChevronDown, Heart, PlayCircle } from 'lucide-react';
 import AnimeRating, { type RatingFormValues } from '@/pages/anime/anime-rating';
 
-/** 播放页状态文案：连载中/已完结带前缀，与列表页的简洁版区分 */
+/** 播放页状态文案：即将开播优先于剧集数，连载中/已完结带前缀，与列表页的简洁版区分 */
 const getRemark = (item: { status: string; videoCount: number }) => {
-  if (!item.videoCount) return '即将开播';
+  if (item.status === 'upcoming' || !item.videoCount) return '即将开播';
   return item.status === 'completed'
     ? `已完结，全${item.videoCount}话`
     : `连载中，更新至第${item.videoCount}话`;
