@@ -11,7 +11,7 @@ export interface Settings {
   playTheme: 'light' | 'dark' | 'system';
   /** 界面字体：CSS font-family 值，'' 为站点默认字体栈 */
   fontFamily: string;
-  /** 老板键：快速伪装页面并暂停视频，热键固定为 Ctrl+Shift+Q */
+  /** 老板键：快速伪装页面并暂停视频，热键固定为 Ctrl+Q */
   bossKey: boolean;
 }
 
