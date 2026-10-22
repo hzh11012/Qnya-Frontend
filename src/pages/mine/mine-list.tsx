@@ -38,9 +38,10 @@ const GridScroll: React.FC<{
   isFetchingNextPage,
   children
 }) => (
-  <div className='overflow-clip'>
+  <div>
     <InfiniteScroll
-      // 组件默认给容器加内联 overflow: auto，改为 visible 由外层 overflow-clip 兜底（与搜索页一致）
+      // 组件默认给容器加内联 overflow: auto，会撑出滚动条并裁剪 hover 放大的卡片，
+      // 覆盖为 visible（style 会 merge 且在默认值之后，必定生效）
       style={{ overflow: 'visible' }}
       dataLength={length}
       next={fetchNextPage}

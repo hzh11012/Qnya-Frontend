@@ -86,7 +86,7 @@ const Index = () => {
   }
 
   return (
-    <div className='my-4 md:my-8 overflow-clip'>
+    <div className='my-4 md:my-8'>
       <div className='flex flex-col gap-1 mb-4 md:mb-6'>
         <PageTitle>{detail.name}</PageTitle>
         <TopicDescription description={detail.description} />

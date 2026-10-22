@@ -79,10 +79,10 @@ const Index = () => {
   }
 
   return (
-    <div className='my-4 md:my-8 overflow-clip'>
+    <div className='my-4 md:my-8'>
       <InfiniteScroll
-        // 组件默认给容器加内联 overflow: auto，最后一行按钮按压位移
-        // 会把容器撑出滚动条，改为 visible 由外层 overflow-clip 兕底
+        // 组件默认给容器加内联 overflow: auto，会撑出滚动条并裁剪 hover 放大的卡片，
+        // 覆盖为 visible（style 会 merge 且在默认值之后，必定生效）
         style={{ overflow: 'visible' }}
         dataLength={list.length}
         next={fetchMore}

@@ -92,10 +92,11 @@ const Index = () => {
     return <Exception type='empty' />;
   }
   return (
-    <div className='my-4 md:my-8 overflow-clip'>
+    <div className='my-4 md:my-8'>
       <PageTitle className='mb-3 md:mb-4'>热门动漫排行</PageTitle>
       <InfiniteScroll
-        // 组件默认给容器加内联 overflow: auto，避免撑出多余滚动条
+        // 组件默认给容器加内联 overflow: auto，会撑出滚动条并裁剪 hover 放大的卡片，
+        // 覆盖为 visible（style 会 merge 且在默认值之后，必定生效）
         style={{ overflow: 'visible' }}
         dataLength={list.length}
         next={fetchMore}
