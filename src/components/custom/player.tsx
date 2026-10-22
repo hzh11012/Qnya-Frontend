@@ -11,6 +11,7 @@ const artplayerPluginHlsQuality =
   ).default ?? artplayerPluginHlsQualityRaw;
 import artplayerPluginDanmuku from 'artplayer-plugin-danmuku';
 import { cn } from '@/lib/utils';
+import { getSettings, subscribeSettings, updateSettings } from '@/lib/settings';
 import type { DanmakuItem } from '@/apis/play';
 
 interface PlayerProps {
@@ -24,6 +25,10 @@ interface PlayerProps {
   ref?: React.Ref<{ getTime: () => number }>;
   /** 播放器卸载时回调最后播放进度（秒）。卸载阶段 ref 已被置空，父组件需依赖此回调补存 */
   onUnmounted?: (time: number) => void;
+  /** 单集播放结束回调（自动连播时由父组件切下一集） */
+  onEnded?: () => void;
+  /** 临近结尾回调（剩 NEAR_END_SECONDS 时触发，每次换源最多一次，供父组件预取下一集） */
+  onNearEnd?: () => void;
 }
 
 const playVideo = (video: HTMLVideoElement, url: string, art: Artplayer) => {
@@ -50,6 +55,9 @@ const playVideo = (video: HTMLVideoElement, url: string, art: Artplayer) => {
   }
 };
 
+/** 临近结尾阈值：小于全局 staleTime 30s，保证 ended 时预取缓存仍新鲜 */
+const NEAR_END_SECONDS = 20;
+
 const Player: React.FC<PlayerProps> = ({
   url,
   time,
@@ -58,15 +66,22 @@ const Player: React.FC<PlayerProps> = ({
   onDanmuEmit,
   onIncrementPlay,
   onUnmounted,
+  onEnded,
+  onNearEnd,
   ref
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const artRef = useRef<Artplayer | null>(null);
+  const nearEndFiredRef = useRef(false);
 
   // latest-ref：初始化 effect 闭包固定，回调用 ref 取最新
   const onUnmountedRef = useRef(onUnmounted);
+  const onEndedRef = useRef(onEnded);
+  const onNearEndRef = useRef(onNearEnd);
   useEffect(() => {
     onUnmountedRef.current = onUnmounted;
+    onEndedRef.current = onEnded;
+    onNearEndRef.current = onNearEnd;
   });
 
   useImperativeHandle(ref, () => ({
@@ -94,7 +109,7 @@ const Player: React.FC<PlayerProps> = ({
       autoOrientation: true,
       aspectRatio: false,
       autoPlayback: false,
-      setting: false,
+      setting: true,
       screenshot: false,
       miniProgressBar: true,
       hotkey: true,
@@ -147,11 +162,36 @@ const Player: React.FC<PlayerProps> = ({
 
     art.on('ready', seekTime);
 
+    // 播放器齿轮面板：自动连播开关，与设置页共用同一份本地存储实时联动
+    art.setting.add({
+      name: 'autoNext',
+      html: '自动连播',
+      switch: getSettings().autoNext,
+      onSwitch(item) {
+        const next = !item.switch;
+        updateSettings({ autoNext: next });
+        return next;
+      }
+    });
+    // 设置页/其他 tab 改了开关，反向同步面板开关状态（update 按 name 替换重渲染）
+    const unsubscribeSettings = subscribeSettings(settings => {
+      art.setting.update({
+        name: 'autoNext',
+        html: '自动连播',
+        switch: settings.autoNext
+      });
+    });
+
+    art.on('video:ended', () => {
+      onEndedRef.current?.();
+    });
+
     artRef.current = art;
 
     return () => {
       // 卸载顺序：子组件 cleanup 先于父组件，此刻还能读到进度，交给父组件补存
       onUnmountedRef.current?.(artRef.current?.currentTime ?? 0);
+      unsubscribeSettings();
       art.off('ready', seekTime);
       art.destroy(false);
       artRef.current = null;
@@ -171,10 +211,19 @@ const Player: React.FC<PlayerProps> = ({
       return;
     }
 
+    // 自动连播场景：切源前处于 ended 状态（此时 playing=false，switchUrl
+    // 只保留播放中状态），需在 canplay 后主动恢复播放
+    const wasEnded = art.video?.ended === true;
+
     art.switchUrl(safeUrl);
     if (time) {
       art.once('video:canplay', () => {
         art.seek = time;
+      });
+    }
+    if (wasEnded) {
+      art.once('video:canplay', () => {
+        void art.play();
       });
     }
     // time 与 safeUrl 同帧变化（同一集详情），无需单独依赖
@@ -212,6 +261,29 @@ const Player: React.FC<PlayerProps> = ({
       plugin.load();
     }
   }, [danmaku]);
+
+  // 临近结尾通知：每次换源重新武装，最多触发一次
+  useEffect(() => {
+    nearEndFiredRef.current = false;
+  }, [url]);
+
+  useEffect(() => {
+    const art = artRef.current;
+    if (!art) return;
+
+    const handleTimeUpdate = () => {
+      if (nearEndFiredRef.current || !art.duration) return;
+      if (art.duration - art.currentTime <= NEAR_END_SECONDS) {
+        nearEndFiredRef.current = true;
+        onNearEndRef.current?.();
+      }
+    };
+
+    art.on('video:timeupdate', handleTimeUpdate);
+    return () => {
+      art.off('video:timeupdate', handleTimeUpdate);
+    };
+  }, [url]);
 
   return (
     <div

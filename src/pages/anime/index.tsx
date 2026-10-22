@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   keepPreviousData,
@@ -31,6 +31,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { useSettings } from '@/lib/settings';
+import { applyTheme, useTheme } from '@/components/custom/theme-context';
 import AnimeDescription from '@/pages/anime/anime-description';
 import AnimeEpisode from '@/pages/anime/anime-episode';
 import AnimeSideList from '@/pages/anime/anime-side-list';
@@ -175,6 +177,10 @@ const Anime: React.FC = () => {
     persistProgress();
     setManualVideoId(id);
     navigate(`/anime/${id}`);
+    // 立即把「最后观看」指向新集（进度 0）：历史记录是续播决策的事实来源，
+    // 必须与切集意图同步，否则在首次心跳（10s）前刷新会被续播逻辑弹回上一集，
+    // 上一集从结尾秒触发 ended 又自动连播回来，形成「切回上一集再切回」的闪烁
+    saveHistory(id, 0).catch(() => {});
   };
 
   const invalidateDetail = () => {
@@ -221,11 +227,96 @@ const Anime: React.FC = () => {
     playingVideoRef.current = detail?.video.id ?? null;
   }, [detail]);
 
+  // 自动连播：开关读本地设置（默认开）；下一集 = 选集列表中 episode 大于当前集的最小者，
+  // 复用 handleSelectVideo 切集（保存本集进度 + 下一集从头播），最后一集停在原地；
+  // 1s 时间窗防抖（避免极少数浏览器 ended 重复触发导致重复切集，不阻翌重播再看完）
+  const { autoNext, playTheme } = useSettings();
+  const { resolvedTheme } = useTheme();
+
+  // 播放页主题独立于平台主题（如 B 站的播放窗口颜色模式）：
+  // 播放页不在主布局内（无侧栏/头部），挂载期间直接覆写根主题类，
+  // 离开时恢复；useLayoutEffect 保证首帧不闪错主题；
+  // resolvedTheme 变化（系统主题切换）时本 effect 会重跑，覆写不被全局逻辑冲掉
+  useLayoutEffect(() => {
+    applyTheme(playTheme === 'system' ? resolvedTheme : playTheme, false);
+    return () => applyTheme(resolvedTheme, false);
+  }, [playTheme, resolvedTheme]);
+  const lastEndedAtRef = useRef(0);
+
+  /** 选集列表中当前集的下一集（episode 升序取紧邻的更大者），无则 null */
+  const findNextVideo = () => {
+    if (!detail) return null;
+    return (
+      [...detail.videos]
+        .sort((a, b) => a.episode - b.episode)
+        .find(item => item.episode > detail.video.episode) ?? null
+    );
+  };
+
+  // 临近结尾（播放器剩 NEAR_END_SECONDS，小于全局 staleTime 30s）预取下一集
+  // 详情+弹幕，ended 时缓存命中，switchUrl 立即执行，消除详情请求的串行等待
+  const handleNearEnd = () => {
+    const next = findNextVideo();
+    if (!next) return;
+    void queryClient.prefetchQuery({
+      queryKey: ['play-detail', next.id],
+      queryFn: () => getPlayDetail(next.id)
+    });
+    void queryClient.prefetchQuery({
+      queryKey: ['danmakus', next.id],
+      queryFn: () => getDanmakuList(next.id)
+    });
+  };
+
+  const handleEnded = () => {
+    if (!detail || Date.now() - lastEndedAtRef.current < 1000) return;
+    lastEndedAtRef.current = Date.now();
+    if (!autoNext) return;
+    const next = findNextVideo();
+    if (next) handleSelectVideo(next.id);
+  };
+
   // 每 10s 心跳保存进度，刷新最多丢几秒；卸载补存由 Player onUnmounted 回调触发
   // （卸载时子组件 Player 先清理，ref 已不可用，不能再从 getTime 读）
   useEffect(() => {
     const timer = setInterval(persistProgress, 10_000);
     return () => clearInterval(timer);
+  }, []);
+
+  // 刷新/关闭/切后台时补存进度：
+  // - F5/关页时 React unmount 不会执行，onUnmounted 补存失效，只能靠这里
+  // - 页面卸载后普通 fetch 会被浏览器取消，必须用 keepalive
+  // - 不走 axios：拦截器/异步链路在卸载阶段不可靠，且 CSRF 头需手动携带
+  //   （后端对写操作校验 X-XSRF-TOKEN，token 存在 JS 可读的 XSRF-TOKEN Cookie）
+  useEffect(() => {
+    const flushKeepalive = () => {
+      const vid = playingVideoRef.current;
+      const t = playerRef.current?.getTime() ?? 0;
+      if (!vid || t <= 1) return;
+      const token = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/)?.[1];
+      void fetch(`/api/client/play/${vid}/history`, {
+        method: 'POST',
+        credentials: 'include',
+        keepalive: true,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'X-XSRF-TOKEN': token } : {})
+        },
+        body: JSON.stringify({ time: t })
+      }).catch(() => {});
+    };
+
+    // pagehide 覆盖刷新/关闭/跳转外站；visibilitychange 覆盖切 tab/最小化
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flushKeepalive();
+    };
+
+    window.addEventListener('pagehide', flushKeepalive);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('pagehide', flushKeepalive);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, []);
 
   const { mutate: handleRating, isPending: ratingLoading } = useMutation({
@@ -315,6 +406,8 @@ const Anime: React.FC = () => {
           onDanmuEmit={handleDanmuEmit}
           onIncrementPlay={incrementPlay}
           onUnmounted={flushProgress}
+          onEnded={handleEnded}
+          onNearEnd={handleNearEnd}
         />
       </div>
 
