@@ -6,7 +6,7 @@ import {
   OctagonXIcon,
   TriangleAlertIcon
 } from 'lucide-react';
-import { useTheme } from '@/components/custom/theme-provider';
+import { useTheme } from '@/components/custom/theme-context';
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = 'system' } = useTheme();

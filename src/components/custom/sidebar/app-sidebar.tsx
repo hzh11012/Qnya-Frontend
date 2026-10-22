@@ -8,7 +8,7 @@ import Logo from '@/components/custom/logo';
 import Navbar from '@/components/custom/sidebar/navbar';
 import Mine from '@/components/custom/sidebar/mine';
 import ThemeSwitch from '@/components/custom/theme-switch';
-import LogOut from '@/components/custom/sidebar/logout';
+import SettingsEntry from '@/components/custom/sidebar/settings-entry';
 
 const AppSideBar: React.FC<React.ComponentProps<typeof Sidebar>> = ({
   ...props
@@ -24,7 +24,7 @@ const AppSideBar: React.FC<React.ComponentProps<typeof Sidebar>> = ({
       <SidebarFooter className='gap-6 pb-8'>
         <Mine />
         <ThemeSwitch />
-        <LogOut />
+        <SettingsEntry />
       </SidebarFooter>
     </Sidebar>
   );

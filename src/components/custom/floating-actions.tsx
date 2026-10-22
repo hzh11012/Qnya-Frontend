@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowUp, Moon, Sun } from 'lucide-react';
-import { useTheme } from '@/components/custom/theme-provider';
+import { useTheme } from '@/components/custom/theme-context';
 import { cn } from '@/lib/utils';
 
 /** FAB 公共样式：圆角毛玻璃卡片，hover 主题色 */

@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from '@/components/custom/theme-provider';
+import BossKey from '@/components/custom/boss-key';
+import SettingsStyle from '@/components/custom/settings-style';
 import { Toaster } from '@/components/ui/sonner';
 import router from '@/routes';
 import '@/style/global.css';
@@ -29,6 +31,8 @@ createRoot(document.getElementById('root')!).render(
       >
         <RouterProvider router={router} />
         <Toaster position='top-right' />
+        <SettingsStyle />
+        <BossKey />
       </ThemeProvider>
     </QueryClientProvider>
   </StrictMode>
