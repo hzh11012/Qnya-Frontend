@@ -14,7 +14,7 @@ const FooterItem: React.FC<{
 
   return (
     <div
-      className='flex flex-col text-xs items-center justify-center text-card-foreground cursor-pointer select-none gap-1'
+      className='flex flex-none flex-col text-xs items-center justify-center text-card-foreground cursor-pointer select-none gap-1'
       onClick={() => navigate(url)}
     >
       <Icon

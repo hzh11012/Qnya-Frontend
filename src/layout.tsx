@@ -13,7 +13,8 @@ const Layout = () => {
       <SidebarInset>
         <HeaderProvider>
           <AppHeader className='px-4.5 md:px-8 justify-between' />
-          <HeaderInset className='md:max-w-441 md:mx-auto md:px-8 px-4 transition-[max-width,padding,margin] duration-200'>
+          {/* min-w 限位：极窄屏下内容不被挤压错乱，宁可整体横向滚动 */}
+          <HeaderInset className='min-w-80 md:max-w-441 md:mx-auto md:px-8 px-4 transition-[max-width,padding,margin] duration-200'>
             <Outlet />
           </HeaderInset>
           <AppFooter />

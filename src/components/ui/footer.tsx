@@ -28,13 +28,17 @@ function Footer({
       <div
         data-slot='footer-container'
         className={cn(
-          'fixed z-10 left-0 right-0 h-(--footer-height) flex bottom-0 border-t-1'
+          // 极窄屏（<320px）：内部横向滚动，tab 项不被压缩；正常宽度无感
+          'fixed z-10 left-0 right-0 h-(--footer-height) flex bottom-0 border-t-1 overflow-x-auto'
         )}
       >
         <div
           data-footer='footer'
           data-slot='footer-inner'
-          className={cn('relative bg-background flex size-full', className)}
+          className={cn(
+            'relative bg-background flex size-full min-w-80',
+            className
+          )}
           {...props}
         >
           {children}
