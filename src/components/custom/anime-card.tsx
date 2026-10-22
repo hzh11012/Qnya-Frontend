@@ -47,6 +47,8 @@ interface AnimeCardProps extends AnimeCardSkeletonProps {
   time?: string;
   /** 封面右下角角标（如状态/进度） */
   tip?: string;
+  /** 标题右侧操作区（如删除按钮） */
+  action?: React.ReactNode;
   onClick?: () => void;
 }
 
@@ -57,6 +59,7 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
   remark,
   time,
   tip,
+  action,
   className,
   onClick
 }) => {
@@ -117,12 +120,15 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
         )}
         <div className='bg-card-cover absolute -bottom-0.5 z-1 h-10 w-full' />
       </div>
-      <div
-        className='mt-2.5 line-clamp-1 w-fit cursor-pointer text-sm transition-[color] duration-200 hover:text-primary'
-        title={title}
-        onClick={onClick}
-      >
-        {title}
+      <div className='mt-2.5 flex w-full items-center gap-1'>
+        <div
+          className='line-clamp-1 min-w-0 flex-1 cursor-pointer text-sm transition-[color] duration-200 hover:text-primary'
+          title={title}
+          onClick={onClick}
+        >
+          {title}
+        </div>
+        {action}
       </div>
       {remark && (
         <div

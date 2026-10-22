@@ -14,6 +14,8 @@ interface UsePagedListOptions<T> {
   fetchPage: (page: number) => Promise<Paged<T>>;
   /** 是否启用请求 */
   enabled?: boolean;
+  /** 覆盖全局 staleTime（如播放页会写入历史/追番，进入列表页需拉最新数据时传 0） */
+  staleTime?: number;
 }
 
 /**
@@ -24,12 +26,14 @@ interface UsePagedListOptions<T> {
 const usePagedList = <T>({
   queryKey,
   fetchPage,
-  enabled = true
+  enabled = true,
+  staleTime
 }: UsePagedListOptions<T>) => {
   const query = useInfiniteQuery({
     queryKey,
     queryFn: ({ pageParam }) => fetchPage(pageParam),
     initialPageParam: 1,
+    staleTime,
     getNextPageParam: (lastPage, allPages) => {
       const fetched = allPages.reduce(
         (sum, page) => sum + page.items.length,

@@ -48,7 +48,7 @@ const NameForm: React.FC<{ onOpenChange: (open: boolean) => void }> = ({
   };
 
   return (
-    <DialogContent className='max-w-sm bg-card border-border dark:border-border/60'>
+    <DialogContent className='max-w-sm'>
       <DialogHeader>
         <DialogTitle className='sm:text-left'>编辑资料</DialogTitle>
         <DialogDescription className='sr-only'>修改你的名称</DialogDescription>

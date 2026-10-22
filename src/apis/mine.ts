@@ -14,6 +14,14 @@ export type MineHistoryItem = ApiResult<
   'get'
 >['items'][number];
 
+/** 删除一条自己的历史记录（按动漫） */
+const deleteMyHistory = (animeId: string) => {
+  return request.delete<{ deleted: boolean }>(
+    `/api/client/mine/histories/${animeId}`,
+    { showSuccessToast: true }
+  );
+};
+
 type MineCollectionsRes = ApiResult<'/api/client/mine/collections', 'get'>;
 type MineHistoriesRes = ApiResult<'/api/client/mine/histories', 'get'>;
 
@@ -33,6 +41,13 @@ const getMyHistories = (
   });
 };
 
+/** 清空自己的全部历史记录 */
+const clearMyHistories = () => {
+  return request.delete<{ cleared: number }>('/api/client/mine/histories', {
+    showSuccessToast: true
+  });
+};
+
 /** 更新个人资料：avatar 为压缩后的 base64 dataURL 或 null（清除头像） */
 const updateProfile = (data: { name?: string; avatar?: string | null }) => {
   return request.patch<User>('/api/auth/me', data, {
@@ -40,4 +55,10 @@ const updateProfile = (data: { name?: string; avatar?: string | null }) => {
   });
 };
 
-export { getMyCollections, getMyHistories, updateProfile };
+export {
+  clearMyHistories,
+  deleteMyHistory,
+  getMyCollections,
+  getMyHistories,
+  updateProfile
+};
