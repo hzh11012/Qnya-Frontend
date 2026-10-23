@@ -25,6 +25,14 @@ const deleteMyHistory = (animeId: string) => {
 type MineCollectionsRes = ApiResult<'/api/client/mine/collections', 'get'>;
 type MineHistoriesRes = ApiResult<'/api/client/mine/histories', 'get'>;
 
+/** 我的页面统计（信息条展示用） */
+export type MineStats = ApiResult<'/api/client/mine/stats', 'get'>;
+
+/** 我的页面统计：追番数与历史部数 */
+const getMyStats = () => {
+  return request.get<MineStats>('/api/client/mine/stats');
+};
+
 const getMyCollections = (
   params: ApiQuery<'/api/client/mine/collections', 'get'>
 ) => {
@@ -60,5 +68,6 @@ export {
   deleteMyHistory,
   getMyCollections,
   getMyHistories,
+  getMyStats,
   updateProfile
 };

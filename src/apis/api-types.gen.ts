@@ -2585,6 +2585,8 @@ export interface paths {
                 /** @enum {string} */
                 role: 'admin' | 'premium' | 'user' | 'guest';
                 avatar: string | null;
+                /** Format: date-time */
+                createdAt: string;
               };
             };
           };
@@ -2631,6 +2633,8 @@ export interface paths {
                 /** @enum {string} */
                 role: 'admin' | 'premium' | 'user' | 'guest';
                 avatar: string | null;
+                /** Format: date-time */
+                createdAt: string;
               };
             };
           };
@@ -2730,6 +2734,8 @@ export interface paths {
                 /** @enum {string} */
                 role: 'admin' | 'premium' | 'user' | 'guest';
                 avatar: string | null;
+                /** Format: date-time */
+                createdAt: string;
               };
             };
           };
@@ -3081,6 +3087,49 @@ export interface paths {
                     videoCount: number;
                   }[];
                 }[];
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/client/mine/stats': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                collections: number;
+                histories: number;
               };
             };
           };

@@ -274,6 +274,7 @@ const ClearHistoriesButton: React.FC = () => {
     mutationFn: clearMyHistories,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mine-histories'] });
+      queryClient.invalidateQueries({ queryKey: ['mine-stats'] });
       setConfirmOpen(false);
     }
   });
@@ -325,9 +326,11 @@ const HistoryCard: React.FC<{ item: MineHistoryItem }> = ({ item }) => {
 
   const remove = useMutation({
     mutationFn: () => deleteMyHistory(item.animeId),
-    // 删除后刷新所有关键字变体的历史列表
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['mine-histories'] })
+    // 删除后刷新所有关键字变体的历史列表与信息条统计
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['mine-histories'] });
+      queryClient.invalidateQueries({ queryKey: ['mine-stats'] });
+    }
   });
 
   return (
