@@ -278,6 +278,7 @@ const HomeHero: React.FC<{
   return (
     <div className='flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-6'>
       {banners.length > 0 && <HeroCarousel items={banners} />}
+      {/* 新番发现：无数据时整个隐藏，轮播独占整行 */}
       {picks.length > 0 && (
         <div className='flex flex-col rounded-sm bg-card p-3 animate-fade-up [animation-delay:100ms] lg:w-[320px] lg:shrink-0 xl:w-[360px]'>
           <div className='mb-2 flex items-center justify-between px-2 pt-1 lg:px-2'>
@@ -290,7 +291,13 @@ const HomeHero: React.FC<{
               <ChevronRight size={18} />
             </button>
           </div>
-          <div className='grid flex-1 grid-cols-1 content-between gap-1 sm:grid-cols-2 sm:content-start lg:flex lg:flex-col lg:justify-between'>
+          {/* 满 4 条时两端对齐撑满轮播高度；不足时顶部对齐，避免被拉开大空隙 */}
+          <div
+            className={cn(
+              'grid flex-1 grid-cols-1 content-between gap-1 sm:grid-cols-2 sm:content-start lg:flex lg:flex-col',
+              picks.length >= 4 ? 'lg:justify-between' : 'lg:justify-start'
+            )}
+          >
             {picks.map((item, i) => (
               <PickRow
                 key={item.animeId}
