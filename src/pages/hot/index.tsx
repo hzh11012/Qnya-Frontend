@@ -27,20 +27,9 @@ const HotCardSkeleton: React.FC = () => {
 
 HotCardSkeleton.displayName = 'HotCardSkeleton';
 
-/** 排行角标配色：TOP3 金/银/铜，4-10 半透明黑（在封面图上保证可读性） */
-const RANK_BADGE_CLASS = [
-  'bg-gradient-to-br from-amber-400 to-amber-600',
-  'bg-gradient-to-br from-zinc-300 to-zinc-500',
-  'bg-gradient-to-br from-orange-400 to-orange-700'
-];
-
-const HotCard: React.FC<{ item: ClientAnimeItem; rank: number }> = ({
-  item,
-  rank
-}) => {
+const HotCard: React.FC<{ item: ClientAnimeItem }> = ({ item }) => {
   const { name, cover, remark } = item;
   const navigate = useNavigate();
-  const showRank = rank > 0 && rank <= 10;
 
   return (
     <div className='w-full flex flex-col gap-2'>
@@ -53,13 +42,6 @@ const HotCard: React.FC<{ item: ClientAnimeItem; rank: number }> = ({
           className='absolute inset-0'
           imageClassName='md:transition-[opacity]'
         />
-        {showRank && (
-          <div
-            className={`absolute top-0 left-0 flex h-6 w-6 items-center justify-center rounded-br-sm text-xs font-bold text-white shadow-sm ${rank <= 3 ? RANK_BADGE_CLASS[rank - 1] : 'bg-black/50'}`}
-          >
-            {rank}
-          </div>
-        )}
         <div className='absolute inset-x-0 -bottom-0.5 h-10 bg-card-cover' />
         <div className='absolute bottom-1.5 right-2 text-white text-xs'>
           {getStatusText(item)}
@@ -122,11 +104,10 @@ const Index = () => {
         loader={''}
       >
         <div className={HOT_GRID_CLASS}>
-          {list.map((item, index) => (
+          {list.map(item => (
             <HotCard
               key={item.id}
               item={item}
-              rank={index + 1}
             />
           ))}
           {isFetchingNextPage && (
