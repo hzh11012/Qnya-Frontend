@@ -62,7 +62,10 @@ const AnimeDescription: React.FC<AnimeDescriptionProps> = ({
           })}
           onClick={onCollected}
         >
-          <Heart />
+          <Heart
+            key={String(isCollected)}
+            className='animate-heart-pop'
+          />
           {isCollected ? '已追番' : '追番'}
         </Button>
       </div>

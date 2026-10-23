@@ -75,3 +75,34 @@ html {
     display: none;
   }
 }
+
+/* 轮播 Ken Burns：当前帧图片缓慢放大，营造电影感（切帧时随类移除自动复位） */
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+.animate-ken-burns {
+  animation: ken-burns 18s ease-out forwards;
+}
+
+/* 追番按钮爱心弹跳：isCollected 变化触发（key 重挂载播放一次） */
+@keyframes heart-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-heart-pop {
+  animation: heart-pop 0.4s ease;
+}

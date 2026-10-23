@@ -243,7 +243,7 @@ const Index = () => {
   if (isLoading || !data) return <HomeSkeleton />;
 
   return (
-    <div className='my-4 flex flex-col gap-6 transition-[margin] duration-200 md:my-8 md:gap-8'>
+    <div className='my-4 flex animate-fade-in flex-col gap-6 transition-[margin] duration-200 md:my-8 md:gap-8'>
       {/* 轮播 + 新番发现（后端未返回时组件内返回 null） */}
       <HomeHero
         banners={data.banners}

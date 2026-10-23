@@ -27,11 +27,12 @@ const SLIDE_DOTS_CLASS =
 const chipGlass = (settled: boolean) =>
   settled ? 'backdrop-blur-md' : 'backdrop-blur-none';
 
-/** 轮播单帧：全幅大图 + 底部渐变，文案只留标题，保持电影感 */
-const BannerSlide: React.FC<{ item: HomeBannerItem; settled: boolean }> = ({
-  item,
-  settled
-}) => {
+/** 轮播单帧：全幅大图 + 底部渐变，文案只留标题，保持电影感；当前帧缓慢 Ken Burns */
+const BannerSlide: React.FC<{
+  item: HomeBannerItem;
+  settled: boolean;
+  active: boolean;
+}> = ({ item, settled, active }) => {
   const navigate = useNavigate();
 
   return (
@@ -42,6 +43,8 @@ const BannerSlide: React.FC<{ item: HomeBannerItem; settled: boolean }> = ({
       <CoverImage
         src={item.banner}
         className='absolute inset-0'
+        // 当前帧停稳后缓慢推近（Ken Burns），切帧自动复位
+        imageClassName={active && settled ? 'animate-ken-burns' : undefined}
       />
       {/* 底部主渐变 + 左侧渐变：中部文案区压暗，画面上下保持通透 */}
       <div className='absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent' />
@@ -142,10 +145,10 @@ const HeroCarousel: React.FC<{ items: HomeBannerItem[] }> = ({ items }) => {
     <Carousel
       setApi={setEmblaApi}
       opts={{ loop: true }}
-      className='relative flex-1 overflow-hidden rounded-sm bg-card lg:min-h-96 [&_[data-slot=carousel-content]]:h-full'
+      className='relative flex-1 animate-fade-up overflow-hidden rounded-sm bg-card lg:min-h-96 [&_[data-slot=carousel-content]]:h-full'
     >
       <CarouselContent className='ml-0 h-full will-change-transform'>
-        {items.map(item => (
+        {items.map((item, i) => (
           <CarouselItem
             key={item.animeId}
             className='h-full pl-0'
@@ -153,6 +156,7 @@ const HeroCarousel: React.FC<{ items: HomeBannerItem[] }> = ({ items }) => {
             <BannerSlide
               item={item}
               settled={stillGlass}
+              active={i === current}
             />
           </CarouselItem>
         ))}
@@ -275,7 +279,7 @@ const HomeHero: React.FC<{
     <div className='flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-6'>
       {banners.length > 0 && <HeroCarousel items={banners} />}
       {picks.length > 0 && (
-        <div className='flex flex-col rounded-sm bg-card p-3 lg:w-[320px] lg:shrink-0 xl:w-[360px]'>
+        <div className='flex flex-col rounded-sm bg-card p-3 animate-fade-up [animation-delay:100ms] lg:w-[320px] lg:shrink-0 xl:w-[360px]'>
           <div className='mb-2 flex items-center justify-between px-2 pt-1 lg:px-2'>
             <h2 className='text-lg font-bold'>新番发现</h2>
             <button
