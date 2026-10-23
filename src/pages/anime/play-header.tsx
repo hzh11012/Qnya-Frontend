@@ -6,6 +6,7 @@ import {
   House,
   Monitor,
   Moon,
+  Share2,
   Sun
 } from 'lucide-react';
 import {
@@ -18,6 +19,17 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSettings, updateSettings } from '@/lib/settings';
 import { useNavPosition } from '@/lib/nav-position';
+import { toast } from 'sonner';
+
+/** 分享当前播放页：复制链接到剪贴板 */
+const handleShare = async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    toast.success('链接已复制，快去分享吧');
+  } catch {
+    toast.error('复制失败，请手动复制地址栏链接');
+  }
+};
 
 /** 播放页主题可选值（提升到模块级，避免每次渲染重建） */
 const PLAY_THEME_OPTIONS = [
@@ -118,6 +130,12 @@ const PlayHeader: React.FC = () => {
       </div>
       <div className='flex items-center gap-1'>
         <PlayThemeMenu />
+        <HeaderIcon
+          title='分享'
+          onClick={() => void handleShare()}
+        >
+          <Share2 size={18} />
+        </HeaderIcon>
       </div>
     </header>
   );
