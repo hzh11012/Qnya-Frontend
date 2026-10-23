@@ -36,12 +36,12 @@ import { applyTheme, useTheme } from '@/components/custom/theme-context';
 import AnimeDescription from '@/pages/anime/anime-description';
 import AnimeEpisode from '@/pages/anime/anime-episode';
 import AnimeSideList from '@/pages/anime/anime-side-list';
+import PlayHeader from '@/pages/anime/play-header';
 import type { RatingFormValues } from '@/pages/anime/anime-rating';
 import {
   ChevronLeft,
   ChevronRight,
   EllipsisVertical,
-  House,
   MessageSquareWarning,
   RefreshCcw
 } from 'lucide-react';
@@ -62,7 +62,6 @@ const AnimeDropdownMenu: React.FC<{ animeId: string }> = ({ animeId }) => {
   });
 
   const menuItems = [
-    { icon: House, label: '回到首页', onClick: () => navigate('/') },
     { icon: RefreshCcw, label: '重新加载', onClick: () => navigate(0) },
     {
       icon: MessageSquareWarning,
@@ -74,14 +73,16 @@ const AnimeDropdownMenu: React.FC<{ animeId: string }> = ({ animeId }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div
+        <button
+          type='button'
           className={cn(
-            'absolute z-20 flex cursor-pointer items-center justify-center rounded-sm size-8 top-2 right-5 text-foreground',
+            'flex cursor-pointer items-center justify-center rounded-sm size-8 text-foreground',
             'transition-colors duration-200 hover:bg-border'
           )}
+          title='更多'
         >
           <EllipsisVertical size={18} />
-        </div>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className='w-fit'
@@ -366,95 +367,100 @@ const Anime: React.FC = () => {
 
   if (isPending || !detail) {
     return (
-      <div className='flex flex-col gap-4 p-6 lg:flex-row'>
-        <Skeleton className='aspect-video flex-1' />
-        <div className='flex w-full flex-col gap-3 lg:w-90'>
-          <Skeleton className='h-40' />
-          <Skeleton className='h-20' />
-          <Skeleton className='h-20' />
+      <>
+        <PlayHeader />
+        <div className='flex flex-col gap-4 p-6 lg:flex-row'>
+          <Skeleton className='aspect-video flex-1' />
+          <div className='flex w-full flex-col gap-3 lg:w-90'>
+            <Skeleton className='h-40' />
+            <Skeleton className='h-20' />
+            <Skeleton className='h-20' />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className='group flex flex-col lg:flex-row lg:h-screen'>
-      {/* 播放器区域 */}
-      <div className='relative isolate bg-black flex-none lg:flex-1'>
-        {/* 收起/展开侧栏：hover 播放器时显示在右缘 */}
-        <div
-          className={cn(
-            'hidden lg:group-hover:flex absolute top-1/2 -translate-y-1/2 right-0 z-20',
-            'w-7 h-14 items-center justify-center rounded-l-sm cursor-pointer',
-            'bg-black/50 text-white'
-          )}
-          onClick={() => setCollapsed(value => !value)}
-        >
-          {collapsed ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-        </div>
-        <Player
-          ref={playerRef}
-          url={detail.video.url}
-          time={
-            manualVideoId === videoId
-              ? 0
-              : typeof resumeTime === 'number' && resumeTime > 1
-                ? resumeTime
-                : detail.time
-          }
-          danmaku={danmakus}
-          onDanmuEmit={handleDanmuEmit}
-          onIncrementPlay={incrementPlay}
-          onUnmounted={flushProgress}
-          onEnded={handleEnded}
-          onNearEnd={handleNearEnd}
-        />
-      </div>
-
-      {/* 侧栏 */}
-      {!collapsed && (
-        <div className='relative w-full lg:h-full lg:w-95 lg:flex-none border-l border-border bg-background flex flex-col'>
-          <div className='min-h-12.5 border-b flex-none flex items-center px-5 text-base'>
-            简介
+    <>
+      <PlayHeader />
+      <div className='group flex flex-col lg:h-[calc(100vh-3.125rem)] lg:flex-row'>
+        {/* 播放器区域 */}
+        <div className='relative isolate bg-black flex-none lg:flex-1'>
+          {/* 收起/展开侧栏：hover 播放器时显示在右缘 */}
+          <div
+            className={cn(
+              'hidden lg:group-hover:flex absolute top-1/2 -translate-y-1/2 right-0 z-20',
+              'w-7 h-14 items-center justify-center rounded-l-sm cursor-pointer',
+              'bg-black/50 text-white'
+            )}
+            onClick={() => setCollapsed(value => !value)}
+          >
+            {collapsed ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
           </div>
-          <div className='py-5 flex-1 md:overflow-y-auto'>
-            <div className='px-5'>
-              <AnimeDescription
-                detail={detail}
-                isCollected={detail.isCollected}
-                isRating={detail.isRating}
-                onCollected={handleCollected}
-                ratingLoading={ratingLoading}
-                onRating={(values, cb) =>
-                  handleRating(values, { onSuccess: cb })
-                }
-              />
-              <hr className='my-5 border-border' />
-              <AnimeEpisode
-                detail={detail}
-                onSelectVideo={handleSelectVideo}
-              />
-              <hr className='my-5 border-border' />
+          <Player
+            ref={playerRef}
+            url={detail.video.url}
+            time={
+              manualVideoId === videoId
+                ? 0
+                : typeof resumeTime === 'number' && resumeTime > 1
+                  ? resumeTime
+                  : detail.time
+            }
+            danmaku={danmakus}
+            onDanmuEmit={handleDanmuEmit}
+            onIncrementPlay={incrementPlay}
+            onUnmounted={flushProgress}
+            onEnded={handleEnded}
+            onNearEnd={handleNearEnd}
+          />
+        </div>
+
+        {/* 侧栏 */}
+        {!collapsed && (
+          <div className='relative w-full lg:h-full lg:w-95 lg:flex-none border-l border-border bg-background flex flex-col'>
+            <div className='min-h-12.5 border-b flex-none flex items-center justify-between px-5 text-base'>
+              简介
+              <AnimeDropdownMenu animeId={detail.animeId} />
             </div>
-            <AnimeSideList
-              title={`${detail.seriesName} 系列`}
-              list={detail.series}
-              onAnimeClick={handleSelectVideo}
-              className='-my-2'
-            />
-            {!!detail.series.length && <hr className='my-5 border-border' />}
-            <AnimeSideList
-              list={detail.recommendations}
-              showRating
-              onAnimeClick={handleSelectVideo}
-              className='-my-2'
-            />
+            <div className='py-5 flex-1 md:overflow-y-auto'>
+              <div className='px-5'>
+                <AnimeDescription
+                  detail={detail}
+                  isCollected={detail.isCollected}
+                  isRating={detail.isRating}
+                  onCollected={handleCollected}
+                  ratingLoading={ratingLoading}
+                  onRating={(values, cb) =>
+                    handleRating(values, { onSuccess: cb })
+                  }
+                />
+                <hr className='my-5 border-border' />
+                <AnimeEpisode
+                  detail={detail}
+                  onSelectVideo={handleSelectVideo}
+                />
+                <hr className='my-5 border-border' />
+              </div>
+              <AnimeSideList
+                title={`${detail.seriesName} 系列`}
+                list={detail.series}
+                onAnimeClick={handleSelectVideo}
+                className='-my-2'
+              />
+              {!!detail.series.length && <hr className='my-5 border-border' />}
+              <AnimeSideList
+                list={detail.recommendations}
+                showRating
+                onAnimeClick={handleSelectVideo}
+                className='-my-2'
+              />
+            </div>
           </div>
-
-          <AnimeDropdownMenu animeId={detail.animeId} />
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 
