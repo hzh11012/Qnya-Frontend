@@ -89,7 +89,7 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
         onClick={onClick}
       >
         {!image || failed ? (
-          <FailAvatar />
+          <FailAvatar className='absolute inset-0' />
         ) : (
           <>
             {/* 加载中占位：骨架屏脉冲，图片在上层淡入盖住 */}

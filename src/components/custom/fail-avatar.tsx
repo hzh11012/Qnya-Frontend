@@ -6,12 +6,12 @@ interface FailAvatarProps {
   className?: string;
 }
 
-/** 封面加载失败兜底：玻璃质感底 + 空状态插画 */
+/** 封面加载失败兜底：玻璃质感底 + 空状态插画（不自带尺寸，由调用方决定占位大小） */
 const FailAvatar: React.FC<FailAvatarProps> = ({ className }) => {
   return (
     <div
       className={cn(
-        'relative size-full flex items-center justify-center overflow-hidden',
+        'relative flex items-center justify-center overflow-hidden',
         className
       )}
     >

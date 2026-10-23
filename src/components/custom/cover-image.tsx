@@ -10,7 +10,12 @@ interface CoverImageProps {
   imageClassName?: string;
 }
 
-/** 封面图：加载失败或无图时兜底 base64 占位图；加载完成前隐藏避免裂图闪现 */
+/**
+ * 封面图：加载失败或无图时兜底 base64 占位图；加载完成前隐藏避免裂图闪现。
+ * 尺寸类（w-*、aspect-*、flex-none 等）只挂在 wrapper 上，内部元素统一
+ * absolute inset-0 填充——避免 size-full 与 w-* 同时出现导致宽度随 CSS
+ * 生成顺序漂移（曾引发图片未加载时侧栏文字被挤成竖排的闪烁）
+ */
 const CoverImage: React.FC<CoverImageProps> = ({
   src,
   className,
@@ -20,13 +25,17 @@ const CoverImage: React.FC<CoverImageProps> = ({
   const [loaded, setLoaded] = useState(false);
 
   if (!src || failed) {
-    return <FailAvatar className={className} />;
+    return (
+      <div className={cn('relative overflow-hidden', className)}>
+        <FailAvatar className='absolute inset-0' />
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className={cn('relative overflow-hidden', className)}>
       {/* 加载中占位：骨架屏脉冲，图片在上层淡入盖住 */}
-      {!loaded && <Skeleton className={cn('size-full', className)} />}
+      {!loaded && <Skeleton className='absolute inset-0' />}
       <img
         src={src}
         alt=''
@@ -35,13 +44,12 @@ const CoverImage: React.FC<CoverImageProps> = ({
         onError={() => setFailed(true)}
         onLoad={() => setLoaded(true)}
         className={cn(
-          'size-full object-cover transition-opacity duration-200',
+          'absolute inset-0 size-full object-cover transition-opacity duration-200',
           loaded ? 'opacity-100' : 'opacity-0',
-          className,
           imageClassName
         )}
       />
-    </>
+    </div>
   );
 };
 
