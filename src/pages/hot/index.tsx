@@ -71,7 +71,7 @@ const Index = () => {
   const { list, fetchMore, isPending, isFetchingNextPage, hasNextPage } =
     usePagedList({
       queryKey: ['hot-list'],
-      // 热门 = 客户端列表的综合排序（score：评分人数 → 均分）
+      // 热门 = 客户端列表的综合排序（贝叶斯加权 WR：均分为主、评分人数为权重）
       fetchPage: page => getClientList({ page, pageSize: PAGE_SIZE, sort: 1 })
     });
 
