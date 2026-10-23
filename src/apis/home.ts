@@ -15,3 +15,9 @@ const getHome = () => {
 };
 
 export { getHome };
+
+/** 首页轮播条目（banner 大图 + 简介） */
+export type HomeBannerItem = HomeResponse['banners'][number];
+
+/** 新番发现条目（最新入库番剧） */
+export type HomePickItem = HomeResponse['picks'][number];

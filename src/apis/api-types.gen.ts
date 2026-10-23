@@ -3057,6 +3057,33 @@ export interface paths {
               code: 200;
               message: string;
               data: {
+                banners: {
+                  /** Format: uuid */
+                  animeId: string;
+                  /** Format: uuid */
+                  videoId: string | null;
+                  name: string;
+                  banner: string | null;
+                  description: string;
+                  remark: string | null;
+                  /** @enum {string} */
+                  status: 'upcoming' | 'airing' | 'completed';
+                  videoCount: number;
+                }[];
+                picks: {
+                  /** Format: uuid */
+                  animeId: string;
+                  /** Format: uuid */
+                  videoId: string | null;
+                  name: string;
+                  cover: string | null;
+                  remark: string | null;
+                  /** @enum {string} */
+                  status: 'upcoming' | 'airing' | 'completed';
+                  videoCount: number;
+                  score: number;
+                  scoreCount: number;
+                }[];
                 collections: {
                   /** Format: uuid */
                   animeId: string;
@@ -3067,6 +3094,8 @@ export interface paths {
                   /** @enum {string} */
                   status: 'upcoming' | 'airing' | 'completed';
                   videoCount: number;
+                  score: number;
+                  scoreCount: number;
                   banner: string | null;
                   episode: number | null;
                   time: number | null;
@@ -3085,6 +3114,8 @@ export interface paths {
                     /** @enum {string} */
                     status: 'upcoming' | 'airing' | 'completed';
                     videoCount: number;
+                    score: number;
+                    scoreCount: number;
                   }[];
                 }[];
               };

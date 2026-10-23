@@ -4,6 +4,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChevronRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { getHome } from '@/apis/home';
 import type { HomeTypeRow } from '@/apis/home';
@@ -12,6 +13,7 @@ import { usePagedList } from '@/hooks/use-paged-list';
 import { getStatusText } from '@/lib/anime';
 import { formatProgress } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import HomeHero from '@/pages/home/home-hero';
 
 /** 类型行标题映射（后端只返回有数据的类型，adult 仅高级会员/管理员可见） */
 const TYPE_TITLE: Record<HomeTypeRow['type'], string> = {
@@ -183,6 +185,11 @@ const HomeRow: React.FC<{
 /** 加载骨架：追番行（横版 5 卡）+ 三行类型推荐（竖版 7 卡） */
 const HomeSkeleton: React.FC = () => (
   <div className='my-4 flex flex-col gap-6 md:my-8 md:gap-8'>
+    {/* Hero 轮播占位（左文右图比例） */}
+    <div className='flex flex-col gap-4 lg:flex-row lg:gap-6'>
+      <Skeleton className='h-80 w-full rounded-sm sm:h-72 lg:h-96 lg:flex-1' />
+      <Skeleton className='hidden h-80 rounded-sm lg:block lg:h-96 lg:w-[320px] xl:w-[360px]' />
+    </div>
     <HomeRow
       title='我的追番'
       showAll
@@ -237,6 +244,12 @@ const Index = () => {
 
   return (
     <div className='my-4 flex flex-col gap-6 transition-[margin] duration-200 md:my-8 md:gap-8'>
+      {/* 轮播 + 新番发现（后端未返回时组件内返回 null） */}
+      <HomeHero
+        banners={data.banners}
+        picks={data.picks}
+      />
+
       {/* 我的追番：仅登录且有追番数据时展示（后端未登录返回空数组） */}
       {data.collections.length > 0 && (
         <HomeRow
