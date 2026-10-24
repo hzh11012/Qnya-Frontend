@@ -17,10 +17,12 @@ const Layout = () => {
           <AppHeader className='px-4.5 md:px-8 justify-between' />
           {/* min-w 限位：极窄屏下内容不被挤压错乱，宁可整体横向滚动 */}
           <HeaderInset className='min-w-80 md:max-w-441 md:mx-auto md:px-8 px-4 transition-[max-width,padding,margin] duration-200'>
-            {/* 路由切换淡入：key 变化触发重挂载 + 一次性 fade-in */}
+            {/* 路由切换淡入：key 变化触发重挂载 + 一次性 fade-in。
+                flex-1 让包装层撑满 HeaderInset，页面根部的 size-full 空态才能垂直居中；
+                不加 min-h-0，长内容仍能撑开页面正常滚动 */}
             <div
               key={location.pathname}
-              className='animate-fade-in'
+              className='flex animate-fade-in flex-1 flex-col'
             >
               <Outlet />
             </div>
