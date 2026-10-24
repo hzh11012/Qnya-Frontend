@@ -196,12 +196,15 @@ const Player: React.FC<PlayerProps> = ({
       }
     });
 
+    // 连播图标（lucide Repeat，stroke=currentColor 以便高亮色生效）
+    const AUTO_NEXT_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>`;
+
     art.controls.add({
       name: 'autoNext',
       position: 'right',
       index: 6,
       tooltip: '自动连播',
-      html: '连播',
+      html: AUTO_NEXT_ICON,
       style: {
         color: getSettings().autoNext ? 'var(--primary)' : ''
       },
