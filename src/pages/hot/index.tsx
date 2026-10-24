@@ -2,6 +2,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import Exception from '@/components/custom/exception';
 import PageTitle from '@/components/custom/page-title';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getClientList } from '@/apis/anime';
 import type { ClientAnimeItem } from '@/apis/anime';
@@ -68,6 +69,7 @@ const HotCard: React.FC<{ item: ClientAnimeItem }> = ({ item }) => {
 };
 
 const Index = () => {
+  useDocumentTitle('热门动漫排行');
   const { list, fetchMore, isPending, isFetchingNextPage, hasNextPage } =
     usePagedList({
       queryKey: ['hot-list'],

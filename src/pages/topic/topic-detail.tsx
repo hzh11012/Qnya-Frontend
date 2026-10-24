@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Exception from '@/components/custom/exception';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import PageTitle from '@/components/custom/page-title';
 import {
   AnimeSearchCard,
@@ -64,6 +65,7 @@ const Index = () => {
   });
 
   const detail = query.data;
+  useDocumentTitle(detail?.name);
 
   // 番剧详情页尚未实现，点击暂不跳转
   const navigate = useNavigate();

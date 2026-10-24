@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExternalLink, UserRound } from 'lucide-react';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -39,6 +40,7 @@ const SettingRow: React.FC<{
 );
 
 const Settings: React.FC = () => {
+  useDocumentTitle('设置');
   const { autoNext, playTheme, fontFamily, bossKey } = useSettings();
   const { theme, setTheme } = useTheme();
   const { name, avatar } = useAuthStore(

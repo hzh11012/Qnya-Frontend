@@ -4,8 +4,10 @@ import MineCard from './mine-card';
 import ProfileEditDialog from './profile-edit-dialog';
 import { MineCollection, MineHistory, MineHistorySearch } from './mine-list';
 import { useAuthStore } from '@/store/auth';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 const Mine: React.FC = () => {
+  useDocumentTitle('个人中心');
   const [editOpen, setEditOpen] = useState(false);
   const [tab, setTab] = useState('collections');
   const [historyInput, setHistoryInput] = useState('');

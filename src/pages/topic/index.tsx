@@ -4,6 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Exception from '@/components/custom/exception';
 import PageTitle from '@/components/custom/page-title';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getTopicList } from '@/apis/topic';
 import type { TopicItem } from '@/apis/topic';
@@ -71,6 +72,7 @@ TopicCard.displayName = 'TopicCard';
 
 const Index = () => {
   const navigate = useNavigate();
+  useDocumentTitle('专题推荐');
 
   const query = useInfiniteQuery({
     queryKey: ['topic-list'],

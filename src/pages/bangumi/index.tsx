@@ -7,6 +7,7 @@ import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
 import { getClientList, getClientTags } from '@/apis/anime';
 import type { ClientAnimeItem } from '@/apis/anime';
 import { usePagedList } from '@/hooks/use-paged-list';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { getStatusText } from '@/lib/anime';
 import { useAuthStore } from '@/store/auth';
 import FilterRow, { type FilterOption } from './filter-row';
@@ -257,6 +258,7 @@ const ListCard: React.FC<{ item: ClientAnimeItem }> = ({ item }) => {
  * @description 各维度单选筛选 + 无限滚动列表；筛选状态同步 URL，可直接分享/回退
  */
 const Bangumi: React.FC = () => {
+  useDocumentTitle('番剧库');
   const { filter, handleChange } = useBangumiFilter();
 
   const { list, fetchMore, isPending, isFetchingNextPage, hasNextPage } =

@@ -4,6 +4,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChevronRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { getHome } from '@/apis/home';
@@ -225,6 +226,7 @@ const HomeSkeleton: React.FC = () => (
 
 const Index = () => {
   const navigate = useNavigate();
+  useDocumentTitle(null);
   const { data, isLoading } = useQuery({
     queryKey: ['home'],
     queryFn: getHome,

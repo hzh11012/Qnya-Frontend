@@ -4,6 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import {
   AnimeSearchCard,
   AnimeSearchCardSkeleton,
@@ -17,6 +18,7 @@ const PAGE_SIZE = 20;
 const Index = () => {
   const [searchParams] = useSearchParams();
   const keyword = searchParams.get('keyword') || '';
+  useDocumentTitle(keyword ? `搜索：${keyword}` : '搜索');
 
   // 关键词变化时 queryKey 变化，自动重置为第一页
   const query = useInfiniteQuery({

@@ -4,6 +4,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { LineShadowText } from '@/components/ui/line-shadow-text';
 import { Button } from '@/components/ui/button';
 import { LoginForm } from '@/pages/login/login-form';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import ThemeSwitch from '@/components/custom/theme-switch';
 import { schema, type LoginFormValues } from '@/pages/login/form-schema';
 import { useAuthStore } from '@/store/auth';
@@ -18,6 +19,7 @@ import { useFlyDanmaku } from '@/pages/login/use-fly-danmaku';
 import { useAuthLogin } from '@/pages/login/use-auth-login';
 
 const Login: React.FC = () => {
+  useDocumentTitle('登录 / 注册');
   const { flies, onBackgroundClick } = useFlyDanmaku();
   const { open, setOpen, count, isDisable, handleSendCode, loading, onLogin } =
     useAuthLogin();

@@ -19,6 +19,7 @@ import {
   type PlayDetail
 } from '@/apis/play';
 import { createFeedback } from '@/apis/feedback';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import FeedbackDialog, {
   type FeedbackFormValues
 } from '@/pages/anime/feedback-dialog';
@@ -138,6 +139,9 @@ const Anime: React.FC = () => {
     // 换集时保留旧数据，播放器走 switchUrl 平滑切源，避免整页骨架闪烁
     placeholderData: keepPreviousData
   });
+
+  // 标题随番名动态变化（换集保留旧数据时标题也不闪烁）
+  useDocumentTitle(detail?.name);
 
   const { data: danmakuRes } = useQuery({
     queryKey: ['danmakus', videoId],
