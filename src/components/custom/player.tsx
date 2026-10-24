@@ -113,7 +113,8 @@ const Player: React.FC<PlayerProps> = ({
       autoOrientation: true,
       aspectRatio: false,
       autoPlayback: false,
-      setting: true,
+      // 倍速/连播已做成控制栏独立控件，齿轮面板只剩弹幕插件设置，入口一并隐藏
+      setting: false,
       screenshot: false,
       miniProgressBar: true,
       hotkey: true,
@@ -179,7 +180,7 @@ const Player: React.FC<PlayerProps> = ({
       name: 'speed',
       position: 'right',
       index: 5,
-      tooltip: '播放速度',
+      // 不加 tooltip：selector 弹层与悬浮提示会重叠
       html: `${getSettings().playbackRate}x`,
       selector: SPEED_OPTIONS.map(value => ({
         value,
