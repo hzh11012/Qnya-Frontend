@@ -55,6 +55,9 @@ const playVideo = (video: HTMLVideoElement, url: string, art: Artplayer) => {
   }
 };
 
+/** 倍速可选档位 */
+const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
+
 /** 临近结尾阈值：小于全局 staleTime 30s，保证 ended 时预取缓存仍新鲜 */
 const NEAR_END_SECONDS = 20;
 
@@ -103,7 +106,8 @@ const Player: React.FC<PlayerProps> = ({
       autoMini: false,
       loop: false,
       quality: [],
-      playbackRate: true,
+      // 倍速从齿轮面板拿出来做成控制栏独立控件（见下方 controls.add），面板不再重复展示
+      playbackRate: false,
       fullscreen: true,
       fullscreenWeb: false,
       autoOrientation: true,
@@ -162,23 +166,63 @@ const Player: React.FC<PlayerProps> = ({
 
     art.on('ready', seekTime);
 
-    // 播放器齿轮面板：自动连播开关，与设置页共用同一份本地存储实时联动
-    art.setting.add({
-      name: 'autoNext',
-      html: '自动连播',
-      switch: getSettings().autoNext,
-      onSwitch(item) {
-        const next = !item.switch;
-        updateSettings({ autoNext: next });
-        return next;
+    // 应用持久化的倍速（切源是同一个 video 元素，设置后跨集仍生效）
+    if (getSettings().playbackRate !== 1) {
+      art.playbackRate = getSettings().playbackRate;
+    }
+
+    // ---- 控制栏独立控件：倍速 + 自动连播 ----
+    // 位置在右簇内置控件（截图20/齿轮30/全屏70）左侧。
+    // 注意：artplayer 5.4 的 Control.add 漏了 return super.add(option)，
+    // 返回值恒为 undefined，不能拿返回值当元素用；控件元素经 art.controls[name] 访问
+    art.controls.add({
+      name: 'speed',
+      position: 'right',
+      index: 5,
+      tooltip: '播放速度',
+      html: `${getSettings().playbackRate}x`,
+      selector: SPEED_OPTIONS.map(value => ({
+        value,
+        html: `${value}x`,
+        default: value === getSettings().playbackRate
+      })),
+      onSelect(item) {
+        const rate = item.value as number;
+        art.playbackRate = rate;
+        updateSettings({ playbackRate: rate });
+        // 返回字符串会替换控件文案
+        return `${rate}x`;
       }
     });
-    // 设置页/其他 tab 改了开关，反向同步面板开关状态（update 按 name 替换重渲染）
+
+    art.controls.add({
+      name: 'autoNext',
+      position: 'right',
+      index: 6,
+      tooltip: '自动连播',
+      html: '连播',
+      style: {
+        color: getSettings().autoNext ? 'var(--primary)' : ''
+      },
+      click() {
+        updateSettings({ autoNext: !getSettings().autoNext });
+      }
+    });
+
+    // 设置页/其他 tab 改了设置，反向同步控件状态（update 会按 name 重建控件）
     const unsubscribeSettings = subscribeSettings(settings => {
-      art.setting.update({
+      art.controls.update({
+        name: 'speed',
+        html: `${settings.playbackRate}x`,
+        selector: SPEED_OPTIONS.map(value => ({
+          value,
+          html: `${value}x`,
+          default: value === settings.playbackRate
+        }))
+      });
+      art.controls.update({
         name: 'autoNext',
-        html: '自动连播',
-        switch: settings.autoNext
+        style: { color: settings.autoNext ? 'var(--primary)' : '' }
       });
     });
 

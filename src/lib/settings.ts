@@ -7,6 +7,8 @@ import { useSyncExternalStore } from 'react';
 export interface Settings {
   /** 看完自动播放下一集 */
   autoNext: boolean;
+  /** 播放器倍速（控制栏选速后持久化，重进播放页仍生效） */
+  playbackRate: number;
   /** 播放页主题：独立于平台主题（'system' 即跟随平台主题） */
   playTheme: 'light' | 'dark' | 'system';
   /** 界面字体：CSS font-family 值，'' 为站点默认字体栈 */
@@ -17,6 +19,7 @@ export interface Settings {
 
 const DEFAULTS: Settings = {
   autoNext: true,
+  playbackRate: 1,
   playTheme: 'dark',
   fontFamily: '',
   bossKey: true
