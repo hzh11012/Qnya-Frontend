@@ -421,48 +421,52 @@ const Anime: React.FC = () => {
           />
         </div>
 
-        {/* 侧栏 */}
-        {!collapsed && (
-          <div className='relative w-full lg:h-full lg:w-95 lg:flex-none border-l border-border bg-background flex flex-col'>
-            <div className='min-h-12.5 border-b flex-none flex items-center justify-between px-5 text-base'>
-              简介
-              <AnimeDropdownMenu animeId={detail.animeId} />
-            </div>
-            <div className='py-5 flex-1 md:overflow-y-auto'>
-              <div className='px-5'>
-                <AnimeDescription
-                  detail={detail}
-                  isCollected={detail.isCollected}
-                  isRating={detail.isRating}
-                  onCollected={handleCollected}
-                  ratingLoading={ratingLoading}
-                  onRating={(values, cb) =>
-                    handleRating(values, { onSuccess: cb })
-                  }
-                />
-                <hr className='my-5 border-border' />
-                <AnimeEpisode
-                  detail={detail}
-                  onSelectVideo={handleSelectVideo}
-                />
-                <hr className='my-5 border-border' />
-              </div>
-              <AnimeSideList
-                title={`${detail.seriesName} 系列`}
-                list={detail.series}
-                onAnimeClick={handleSelectVideo}
-                className='-my-2'
-              />
-              {!!detail.series.length && <hr className='my-5 border-border' />}
-              <AnimeSideList
-                list={detail.recommendations}
-                showRating
-                onAnimeClick={handleSelectVideo}
-                className='-my-2'
-              />
-            </div>
+        {/* 侧栏：移动端始终展示（收起按钮仅桌面可见，collapsed 在移动端无意义）；
+            桌面端受收起状态控制 */}
+        <div
+          className={cn(
+            'relative w-full lg:h-full lg:w-95 lg:flex-none border-l border-border bg-background flex flex-col',
+            collapsed && 'lg:hidden'
+          )}
+        >
+          <div className='min-h-12.5 border-b flex-none flex items-center justify-between px-5 text-base'>
+            简介
+            <AnimeDropdownMenu animeId={detail.animeId} />
           </div>
-        )}
+          <div className='py-5 flex-1 md:overflow-y-auto'>
+            <div className='px-5'>
+              <AnimeDescription
+                detail={detail}
+                isCollected={detail.isCollected}
+                isRating={detail.isRating}
+                onCollected={handleCollected}
+                ratingLoading={ratingLoading}
+                onRating={(values, cb) =>
+                  handleRating(values, { onSuccess: cb })
+                }
+              />
+              <hr className='my-5 border-border' />
+              <AnimeEpisode
+                detail={detail}
+                onSelectVideo={handleSelectVideo}
+              />
+              <hr className='my-5 border-border' />
+            </div>
+            <AnimeSideList
+              title={`${detail.seriesName} 系列`}
+              list={detail.series}
+              onAnimeClick={handleSelectVideo}
+              className='-my-2'
+            />
+            {!!detail.series.length && <hr className='my-5 border-border' />}
+            <AnimeSideList
+              list={detail.recommendations}
+              showRating
+              onAnimeClick={handleSelectVideo}
+              className='-my-2'
+            />
+          </div>
+        </div>
       </div>
     </>
   );
