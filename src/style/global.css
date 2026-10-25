@@ -48,6 +48,15 @@ body,
   vertical-align: unset !important;
 }
 
+/**
+ * 连播控件的描边型 SVG：artplayer 全局规则 .art-video-player svg { fill: ... }
+ * 优先级高于 fill="none" 表现属性，会把开放路径填充成色块，故强制不填充
+ */
+.art-video-player .art-control-autoNext path {
+  fill: none !important;
+  stroke: currentColor;
+}
+
 .art-video-player > .artplayer-plugin-danmuku {
   padding: 0 20px !important;
 }
