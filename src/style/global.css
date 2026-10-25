@@ -61,9 +61,14 @@ body,
   padding: 0 20px !important;
 }
 
+.art-video-player .art-controls-center {
+  min-width: 0;
+}
+
 .art-video-player .art-controls-center .apd-emitter {
   flex: 1;
-  max-width: 260px;
+  max-width: 320px;
+  min-width: 0;
   width: unset;
 }
 
