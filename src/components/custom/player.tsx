@@ -146,7 +146,8 @@ const Player: React.FC<PlayerProps> = ({
             ]
           : []),
         artplayerPluginDanmuku({
-          width: 644,
+          // 发射器外挂阈值：播放器宽度小于该值时，弹幕发射器移到播放器下方单独一行（插件 resize 逻辑）
+          width: 1024,
           emitter: true,
           danmuku: () => Promise.resolve(danmaku),
           beforeEmit: onDanmuEmit
