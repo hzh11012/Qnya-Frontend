@@ -146,8 +146,6 @@ const Player: React.FC<PlayerProps> = ({
             ]
           : []),
         artplayerPluginDanmuku({
-          // 发射器外挂阈值：播放器宽度小于该值时，弹幕发射器移到播放器下方单独一行（插件 resize 逻辑）
-          width: 1024,
           emitter: true,
           danmuku: () => Promise.resolve(danmaku),
           beforeEmit: onDanmuEmit
@@ -159,6 +157,25 @@ const Player: React.FC<PlayerProps> = ({
     art.on('destroy', () => {
       (art as unknown as { hls?: Hls }).hls?.destroy();
     });
+
+    // 弹幕发射器挂载位置按“视口宽度”判断，而非插件默认的“播放器宽度”：
+    // PC 端侧栏可收起，播放器宽度会随收起状态变化约 380px，按播放器宽度判断会导致
+    // 同一窗口下发射器位置不一致；且 artplayer 只监听 window resize，切侧栏不会触发
+    // 插件重新评估。统一为：视口 < lg(1024) 外挂到播放器下方，lg 及以上内嵌控制栏。
+    // 插件 resize() 只做 art.width < option.width 的比较，这里直接覆写阈值再触发重估
+    const EMITTER_VIEWPORT_THRESHOLD = 1024;
+    const syncDanmukuMount = () => {
+      const plugin = art.plugins.artplayerPluginDanmuku as
+        { option: { width: number } } | undefined;
+      if (!plugin) return;
+      plugin.option.width =
+        window.innerWidth < EMITTER_VIEWPORT_THRESHOLD
+          ? Number.MAX_SAFE_INTEGER
+          : 0;
+      art.emit('resize');
+    };
+    syncDanmukuMount();
+    window.addEventListener('resize', syncDanmukuMount);
 
     const seekTime = () => {
       if (time) {
@@ -241,6 +258,7 @@ const Player: React.FC<PlayerProps> = ({
       // 卸载顺序：子组件 cleanup 先于父组件，此刻还能读到进度，交给父组件补存
       onUnmountedRef.current?.(artRef.current?.currentTime ?? 0);
       unsubscribeSettings();
+      window.removeEventListener('resize', syncDanmukuMount);
       art.off('ready', seekTime);
       art.destroy(false);
       artRef.current = null;
