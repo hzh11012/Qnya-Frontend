@@ -5,7 +5,12 @@ import React, {
   useRef,
   useState
 } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import {
+  useParams,
+  useNavigate,
+  useLocation,
+  ScrollRestoration
+} from 'react-router-dom';
 import {
   keepPreviousData,
   useQuery,
@@ -397,6 +402,9 @@ const Anime: React.FC = () => {
 
   return (
     <>
+      {/* 路由切换（如切集）重置窗口滚动条；前进/后退时按位置恢复。
+          桌面端侧栏为内部滚动容器，不受影响 */}
+      <ScrollRestoration />
       <PlayHeader />
       <div className='group flex flex-col lg:h-[calc(100vh-3.125rem)] lg:flex-row'>
         {/* 播放器区域 */}

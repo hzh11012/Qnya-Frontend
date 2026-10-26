@@ -1,5 +1,5 @@
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
 import AppSidebar from '@/components/custom/sidebar/app-sidebar';
 import { HeaderInset, HeaderProvider } from '@/components/ui/header';
 import AppHeader from '@/components/custom/header/app-header';
@@ -29,6 +29,8 @@ const Layout = () => {
           </HeaderInset>
           <AppFooter />
           <FloatingActions />
+          {/* 路由切换重置窗口滚动条；前进/后退时按位置恢复（数据路由专用） */}
+          <ScrollRestoration />
         </HeaderProvider>
       </SidebarInset>
     </SidebarProvider>
