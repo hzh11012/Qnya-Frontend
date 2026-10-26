@@ -1,6 +1,7 @@
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
 import Artplayer from 'artplayer';
-import Hls from 'hls.js';
+// light 构建：裁掉字幕/多音轨/EME（约小 37%），画质切换所需 levels/currentLevel 不受影响
+import Hls from 'hls.js/light';
 import artplayerPluginHlsQualityRaw from 'artplayer-plugin-hls-quality';
 // 该插件的 UMD 构建经 Vite 互操作后会多包一层 default
 const artplayerPluginHlsQuality =
@@ -91,16 +92,13 @@ const Player: React.FC<PlayerProps> = ({
     getTime: () => artRef.current?.currentTime ?? 0
   }));
 
-  // 开发环境走 vite /s3 代理，绕过 s3 的 CORS 限制
-  const safeUrl = import.meta.env.DEV
-    ? url.replace(/^https?:\/\/s3\.qnets\.cn/, '/s3')
-    : url;
-
+  // 播放页直接使用后端返回的资源 URL（生产环境媒体经 nginx 同源 /media/ 下发，
+  // 无跨域问题；开发环境 /api 已代理，媒体 URL 为绝对地址时需后端允许跨域）
   useEffect(() => {
     if (!containerRef.current || artRef.current) return;
 
     const art = new Artplayer({
-      url: safeUrl,
+      url,
       autoplay: true,
       autoSize: false,
       autoMini: false,
@@ -125,7 +123,7 @@ const Player: React.FC<PlayerProps> = ({
       fastForward: true,
       container: containerRef.current!,
       icons: {
-        loading: '<img style="width: 150px;" src="/loading.gif">',
+        loading: '<img style="width: 150px;" src="/loading.webp">',
         state: '<img style="width: 80px;" src="/state.svg">'
       },
       customType: {
@@ -282,7 +280,7 @@ const Player: React.FC<PlayerProps> = ({
     // 只保留播放中状态），需在 canplay 后主动恢复播放
     const wasEnded = art.video?.ended === true;
 
-    art.switchUrl(safeUrl);
+    art.switchUrl(url);
     if (time) {
       art.once('video:canplay', () => {
         art.seek = time;
@@ -293,9 +291,9 @@ const Player: React.FC<PlayerProps> = ({
         void art.play();
       });
     }
-    // time 与 safeUrl 同帧变化（同一集详情），无需单独依赖
+    // time 与 url 同帧变化（同一集详情），无需单独依赖
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safeUrl]);
+  }, [url]);
 
   // 播放开始时播放数 +1（每次换源只记一次）
   useEffect(() => {

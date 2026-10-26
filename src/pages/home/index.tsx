@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChevronRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
@@ -11,6 +10,7 @@ import { getHome } from '@/apis/home';
 import type { HomeTypeRow } from '@/apis/home';
 import { getGuessList } from '@/apis/anime';
 import { usePagedList } from '@/hooks/use-paged-list';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { getStatusText } from '@/lib/anime';
 import { formatProgress } from '@/lib/format';
 import { cn } from '@/lib/utils';
@@ -111,6 +111,11 @@ const GuessSection: React.FC = () => {
         })
     });
 
+  const sentinelRef = useInfiniteScroll(
+    fetchMore,
+    !hasNextPage || isFetchingNextPage
+  );
+
   // 首次加载：骨架屏
   if (isPending) {
     return (
@@ -129,31 +134,27 @@ const GuessSection: React.FC = () => {
 
   return (
     <HomeRow title='猜你喜欢'>
-      <InfiniteScroll
-        // 组件默认给容器加内联 overflow: auto，避免撑出多余滚动条
-        style={{ overflow: 'visible' }}
-        dataLength={list.length}
-        next={fetchMore}
-        hasMore={!!hasNextPage}
-        loader={''}
-      >
-        <div className={GUESS_GRID_CLASS}>
-          {list.map(item => (
-            <AnimeCard
-              key={item.id}
-              title={item.name}
-              image={item.cover ?? ''}
-              remark={item.remark}
-              tip={getStatusText(item)}
-              onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
-            />
+      <div className={GUESS_GRID_CLASS}>
+        {list.map(item => (
+          <AnimeCard
+            key={item.id}
+            title={item.name}
+            image={item.cover ?? ''}
+            remark={item.remark}
+            tip={getStatusText(item)}
+            onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
+          />
+        ))}
+        {isFetchingNextPage &&
+          Array.from({ length: 5 }, (_, i) => (
+            <AnimeCardSkeleton key={`skeleton-${i}`} />
           ))}
-          {isFetchingNextPage &&
-            Array.from({ length: 5 }, (_, i) => (
-              <AnimeCardSkeleton key={`skeleton-${i}`} />
-            ))}
-        </div>
-      </InfiniteScroll>
+      </div>
+      {/* 无限滚动哨兵：进入视口时加载下一页 */}
+      <div
+        ref={sentinelRef}
+        aria-hidden
+      />
     </HomeRow>
   );
 };

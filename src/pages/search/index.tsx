@@ -1,10 +1,10 @@
 import { searchAnime } from '@/apis/search';
 import Exception from '@/components/custom/exception';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { usePagedList } from '@/hooks/use-paged-list';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import {
   AnimeSearchCard,
   AnimeSearchCardSkeleton,
@@ -12,7 +12,6 @@ import {
 } from './anime-search-card';
 import { getStatusText, getPlayText } from '@/lib/anime';
 
-// 原实现即为每次请求拉取 1 条，行为保持不变
 const PAGE_SIZE = 20;
 
 const Index = () => {
@@ -21,24 +20,17 @@ const Index = () => {
   useDocumentTitle(keyword ? `搜索：${keyword}` : '搜索');
 
   // 关键词变化时 queryKey 变化，自动重置为第一页
-  const query = useInfiniteQuery({
-    queryKey: ['search-anime', keyword],
-    queryFn: ({ pageParam }) =>
-      searchAnime({ keyword, page: pageParam, pageSize: PAGE_SIZE }),
-    initialPageParam: 1,
-    enabled: !!keyword,
-    getNextPageParam: (lastPage, allPages) => {
-      const fetched = allPages.reduce(
-        (sum, page) => sum + page.items.length,
-        0
-      );
-      return fetched < lastPage.total && lastPage.items.length > 0
-        ? allPages.length + 1
-        : undefined;
-    }
-  });
+  const { list, fetchMore, isPending, hasNextPage, isFetchingNextPage } =
+    usePagedList({
+      queryKey: ['search-anime', keyword],
+      enabled: !!keyword,
+      fetchPage: page => searchAnime({ keyword, page, pageSize: PAGE_SIZE })
+    });
 
-  const list = query.data?.pages.flatMap(page => page.items) ?? [];
+  const sentinelRef = useInfiniteScroll(
+    fetchMore,
+    !hasNextPage || isFetchingNextPage
+  );
 
   // 番剧详情页尚未实现，点击暂不跳转
   const navigate = useNavigate();
@@ -50,12 +42,6 @@ const Index = () => {
       });
   };
 
-  const fetchMore = () => {
-    if (query.hasNextPage && !query.isFetchingNextPage) {
-      query.fetchNextPage();
-    }
-  };
-
   if (!keyword) {
     return (
       <div className='flex flex-col items-center justify-center h-60 text-muted-foreground gap-2'>
@@ -65,7 +51,7 @@ const Index = () => {
   }
 
   // 首屏加载中：展示骨架屏
-  if (query.isPending) {
+  if (isPending) {
     return (
       <div className={cn(ANIME_CARD_GRID_CLASS, 'my-4 md:my-8')}>
         {Array.from({ length: 4 }, (_, index) => (
@@ -82,44 +68,39 @@ const Index = () => {
 
   return (
     <div className='my-4 md:my-8'>
-      <InfiniteScroll
-        // 组件默认给容器加内联 overflow: auto，会撑出滚动条并裁剪 hover 放大的卡片，
-        // 覆盖为 visible（style 会 merge 且在默认值之后，必定生效）
-        style={{ overflow: 'visible' }}
-        dataLength={list.length}
-        next={fetchMore}
-        hasMore={!!query.hasNextPage}
-        loader={''}
-      >
-        <div className={ANIME_CARD_GRID_CLASS}>
-          {list.map(item => {
-            return (
-              <AnimeSearchCard
-                key={item.id}
-                videoId={item.videoId}
-                image={item.cover}
-                title={item.name}
-                highlightTitle={item.highlightName || item.name}
-                type={item.type}
-                tags={item.tags}
-                year={item.year}
-                month={item.month}
-                statusText={getStatusText(item)}
-                playText={getPlayText(item)}
-                director={item.director}
-                cv={item.cv}
-                description={item.description}
-                scoreCount={item.scoreCount}
-                avgScore={item.avgScore}
-                videos={item.videos}
-                onAnimeClick={handleAnimeClick}
-              />
-            );
-          })}
-          {/* 加载更多时在网格内追加骨架，与参考实现一致 */}
-          {query.isFetchingNextPage && <AnimeSearchCardSkeleton />}
-        </div>
-      </InfiniteScroll>
+      <div className={ANIME_CARD_GRID_CLASS}>
+        {list.map(item => {
+          return (
+            <AnimeSearchCard
+              key={item.id}
+              videoId={item.videoId}
+              image={item.cover}
+              title={item.name}
+              highlightTitle={item.highlightName || item.name}
+              type={item.type}
+              tags={item.tags}
+              year={item.year}
+              month={item.month}
+              statusText={getStatusText(item)}
+              playText={getPlayText(item)}
+              director={item.director}
+              cv={item.cv}
+              description={item.description}
+              scoreCount={item.scoreCount}
+              avgScore={item.avgScore}
+              videos={item.videos}
+              onAnimeClick={handleAnimeClick}
+            />
+          );
+        })}
+        {/* 加载更多时在网格内追加骨架，与参考实现一致 */}
+        {isFetchingNextPage && <AnimeSearchCardSkeleton />}
+      </div>
+      {/* 无限滚动哨兵：进入视口时加载下一页 */}
+      <div
+        ref={sentinelRef}
+        aria-hidden
+      />
     </div>
   );
 };

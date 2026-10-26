@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import { CircleXIcon, EllipsisVertical, Trash2 } from 'lucide-react';
 import Exception from '@/components/custom/exception';
@@ -33,6 +32,7 @@ import {
 import { formatProgress, formatDate } from '@/lib/format';
 import { getStatusText } from '@/lib/anime';
 import { usePagedList } from '@/hooks/use-paged-list';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 
 /** 追番/历史分页大小（与其他列表页一致） */
 const PAGE_SIZE = 20;
@@ -47,9 +47,8 @@ const HISTORY_GRID_CLASS =
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** 按观看时间归入时间区块：今天 / 昨天 / 近一周 / 一周前 */
-const historySectionOf = (watchedAt: Date | string) => {
-  const now = new Date();
+/** 按观看时间归入时间区块：今天 / 昨天 / 近一周 / 一周前（now 由调用方传入快照，避免渲染期取当前时间） */
+const historySectionOf = (watchedAt: Date | string, now: Date) => {
   const startOfToday = new Date(
     now.getFullYear(),
     now.getMonth(),
@@ -65,10 +64,10 @@ const historySectionOf = (watchedAt: Date | string) => {
 const HISTORY_SECTION_ORDER = ['今天', '昨天', '近一周', '一周前'] as const;
 
 /** 把已加载的列表按时间区块分组（保持原排序；同区块内连续，不会出现重复标题） */
-const groupHistories = (list: MineHistoryItem[]) => {
+const groupHistories = (list: MineHistoryItem[], now: Date) => {
   const groups = new Map<string, MineHistoryItem[]>();
   for (const item of list) {
-    const label = historySectionOf(item.watchedAt);
+    const label = historySectionOf(item.watchedAt, now);
     const bucket = groups.get(label);
     if (bucket) bucket.push(item);
     else groups.set(label, [item]);
@@ -88,6 +87,11 @@ export const MineCollection: React.FC = () => {
       fetchPage: page => getMyCollections({ page, pageSize: PAGE_SIZE })
     });
 
+  const sentinelRef = useInfiniteScroll(
+    fetchMore,
+    !hasNextPage || isFetchingNextPage
+  );
+
   if (isPending) {
     return (
       <div className={COLLECTION_GRID_CLASS}>
@@ -104,15 +108,7 @@ export const MineCollection: React.FC = () => {
   if (!list.length) return <Exception type='empty' />;
 
   return (
-    <InfiniteScroll
-      // 组件默认给容器加内联 overflow: auto，会撑出滚动条并裁剪 hover 放大的卡片，
-      // 覆盖为 visible（style 会 merge 且在默认值之后，必定生效）
-      style={{ overflow: 'visible' }}
-      dataLength={list.length}
-      next={fetchMore}
-      hasMore={!!hasNextPage}
-      loader={''}
-    >
+    <div>
       <div className={COLLECTION_GRID_CLASS}>
         {list.map(item => (
           <CollectionCard
@@ -122,7 +118,12 @@ export const MineCollection: React.FC = () => {
         ))}
         {isFetchingNextPage && <AnimeCardSkeleton type='vertical' />}
       </div>
-    </InfiniteScroll>
+      {/* 无限滚动哨兵：进入视口时加载下一页 */}
+      <div
+        ref={sentinelRef}
+        aria-hidden
+      />
+    </div>
   );
 };
 
@@ -185,6 +186,9 @@ export const MineHistorySearch: React.FC<{
 
 /** 历史记录：按时间区块分组的横向 banner 卡网格（仍无限滚动），keyword 由外部传入 */
 export const MineHistory: React.FC<{ keyword: string }> = ({ keyword }) => {
+  // 渲染期不取当前时间（react-compiler purity），挂载时取一次快照即可：
+  // 区块边界以天为单位，实例存活几分钟内不会产生可感知的偏差
+  const [now] = useState(() => new Date());
   const { list, fetchMore, isPending, isFetchingNextPage, hasNextPage, data } =
     usePagedList({
       queryKey: ['mine-histories', keyword],
@@ -197,6 +201,11 @@ export const MineHistory: React.FC<{ keyword: string }> = ({ keyword }) => {
           keyword: keyword || undefined
         })
     });
+
+  const sentinelRef = useInfiniteScroll(
+    fetchMore,
+    !hasNextPage || isFetchingNextPage
+  );
 
   if (isPending) {
     return (
@@ -213,7 +222,7 @@ export const MineHistory: React.FC<{ keyword: string }> = ({ keyword }) => {
 
   if (!list.length) return <Exception type='empty' />;
 
-  const sections = groupHistories(list);
+  const sections = groupHistories(list, now);
   const fetchingMore = isFetchingNextPage;
   const total = data?.pages[0]?.total ?? 0;
 
@@ -226,14 +235,7 @@ export const MineHistory: React.FC<{ keyword: string }> = ({ keyword }) => {
           个相关结果
         </p>
       )}
-      <InfiniteScroll
-        // 同上：覆盖内联 overflow，避免裁剪 hover 放大的卡片
-        style={{ overflow: 'visible' }}
-        dataLength={list.length}
-        next={fetchMore}
-        hasMore={!!hasNextPage}
-        loader={''}
-      >
+      <div>
         {sections.map((section, i) => (
           <section key={section.label}>
             {i === 0 ? (
@@ -261,7 +263,12 @@ export const MineHistory: React.FC<{ keyword: string }> = ({ keyword }) => {
             </div>
           </section>
         ))}
-      </InfiniteScroll>
+        {/* 无限滚动哨兵：进入视口时加载下一页 */}
+        <div
+          ref={sentinelRef}
+          aria-hidden
+        />
+      </div>
     </div>
   );
 };

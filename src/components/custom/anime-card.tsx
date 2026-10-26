@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import FailAvatar from '@/components/custom/fail-avatar';
+import CoverImage from '@/components/custom/cover-image';
 import { cn } from '@/lib/utils';
 
 interface AnimeCardSkeletonProps {
@@ -63,9 +63,6 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
   className,
   onClick
 }) => {
-  const [failed, setFailed] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
   return (
     <div
       className={cn(
@@ -88,26 +85,11 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
         )}
         onClick={onClick}
       >
-        {!image || failed ? (
-          <FailAvatar className='absolute inset-0' />
-        ) : (
-          <>
-            {/* 加载中占位：骨架屏脉冲，图片在上层淡入盖住 */}
-            {!loaded && <Skeleton className='absolute inset-0 size-full' />}
-            <img
-              src={image}
-              alt=''
-              loading='lazy'
-              draggable={false}
-              onError={() => setFailed(true)}
-              onLoad={() => setLoaded(true)}
-              className={cn(
-                'absolute inset-0 size-full object-cover transition-[opacity] duration-200',
-                loaded ? 'opacity-100' : 'opacity-0'
-              )}
-            />
-          </>
-        )}
+        {/* 封面加载/失败兜底逻辑与 CoverImage 统一 */}
+        <CoverImage
+          src={image}
+          className='absolute inset-0'
+        />
         {time && (
           <div className='absolute bottom-1 left-2 z-2 text-xs text-white'>
             {time}

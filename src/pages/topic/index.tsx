@@ -1,10 +1,9 @@
-import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import Exception from '@/components/custom/exception';
 import PageTitle from '@/components/custom/page-title';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { usePagedList } from '@/hooks/use-paged-list';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getTopicList } from '@/apis/topic';
 import type { TopicItem } from '@/apis/topic';
@@ -74,38 +73,22 @@ const Index = () => {
   const navigate = useNavigate();
   useDocumentTitle('专题推荐');
 
-  const query = useInfiniteQuery({
-    queryKey: ['topic-list'],
-    queryFn: ({ pageParam }) =>
-      getTopicList({ page: pageParam, pageSize: PAGE_SIZE }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      const fetched = allPages.reduce(
-        (sum, page) => sum + page.items.length,
-        0
-      );
-      return fetched < lastPage.total && lastPage.items.length > 0
-        ? allPages.length + 1
-        : undefined;
-    }
-  });
+  const { list, fetchMore, isPending, hasNextPage, isFetchingNextPage } =
+    usePagedList({
+      queryKey: ['topic-list'],
+      fetchPage: page => getTopicList({ page, pageSize: PAGE_SIZE })
+    });
 
-  const list = useMemo(
-    () => query.data?.pages.flatMap(page => page.items) ?? [],
-    [query.data]
+  const sentinelRef = useInfiniteScroll(
+    fetchMore,
+    !hasNextPage || isFetchingNextPage
   );
 
   const handleTopicClick = (id: string) => {
     if (id) navigate(`/topic/${id}`);
   };
 
-  const fetchMore = () => {
-    if (query.hasNextPage && !query.isFetchingNextPage) {
-      query.fetchNextPage();
-    }
-  };
-
-  if (query.isPending) {
+  if (isPending) {
     return (
       <div className='my-4 md:my-8'>
         <PageTitle className='mb-3 md:mb-4'>专题推荐</PageTitle>
@@ -125,25 +108,21 @@ const Index = () => {
   return (
     <div className='my-4 md:my-8'>
       <PageTitle className='mb-3 md:mb-4'>专题推荐</PageTitle>
-      <InfiniteScroll
-        // 组件默认给容器加内联 overflow: auto，避免撑出多余滚动条
-        style={{ overflow: 'visible' }}
-        dataLength={list.length}
-        next={fetchMore}
-        hasMore={!!query.hasNextPage}
-        loader={''}
-      >
-        <div className={TOPIC_GRID_CLASS}>
-          {list.map(item => (
-            <TopicCard
-              key={item.id}
-              topic={item}
-              onClick={handleTopicClick}
-            />
-          ))}
-          {query.isFetchingNextPage && <TopicCardSkeleton />}
-        </div>
-      </InfiniteScroll>
+      <div className={TOPIC_GRID_CLASS}>
+        {list.map(item => (
+          <TopicCard
+            key={item.id}
+            topic={item}
+            onClick={handleTopicClick}
+          />
+        ))}
+        {isFetchingNextPage && <TopicCardSkeleton />}
+      </div>
+      {/* 无限滚动哨兵：进入视口时加载下一页 */}
+      <div
+        ref={sentinelRef}
+        aria-hidden
+      />
     </div>
   );
 };

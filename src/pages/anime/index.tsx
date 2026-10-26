@@ -1,4 +1,10 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   keepPreviousData,
@@ -168,13 +174,17 @@ const Anime: React.FC = () => {
     }
   }, [detail, videoId, manualVideoId, skipResume, navigate]);
 
-  /** 弹幕数据转 artplayer 插件结构 */
-  const danmakus: DanmakuItem[] = (danmakuRes?.items ?? []).map(d => ({
-    text: d.text,
-    color: d.color,
-    mode: toPluginMode(d.mode),
-    time: d.time
-  }));
+  /** 弹幕数据转 artplayer 插件结构（useMemo 稳定引用，避免 Player 内弹幕加载 effect 反复重载） */
+  const danmakus: DanmakuItem[] = useMemo(
+    () =>
+      (danmakuRes?.items ?? []).map(d => ({
+        text: d.text,
+        color: d.color,
+        mode: toPluginMode(d.mode),
+        time: d.time
+      })),
+    [danmakuRes]
+  );
 
   const handleSelectVideo = (id: string) => {
     if (!id) return;

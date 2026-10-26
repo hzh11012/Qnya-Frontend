@@ -1,12 +1,12 @@
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import Exception from '@/components/custom/exception';
 import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
 import { getClientList, getClientTags } from '@/apis/anime';
 import type { ClientAnimeItem } from '@/apis/anime';
 import { usePagedList } from '@/hooks/use-paged-list';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { getStatusText } from '@/lib/anime';
 import { useAuthStore } from '@/store/auth';
@@ -278,6 +278,11 @@ const Bangumi: React.FC = () => {
         })
     });
 
+  const sentinelRef = useInfiniteScroll(
+    fetchMore,
+    !hasNextPage || isFetchingNextPage
+  );
+
   return (
     <div className='my-4 md:my-8'>
       <BangumiSelect
@@ -292,13 +297,7 @@ const Bangumi: React.FC = () => {
           <Exception type='empty' />
         </div>
       ) : (
-        <InfiniteScroll
-          style={{ overflow: 'visible' }}
-          dataLength={list.length}
-          next={fetchMore}
-          hasMore={!!hasNextPage}
-          loader={''}
-        >
+        <div>
           <div className={GRID_CLASS}>
             {list.map(item => (
               <ListCard
@@ -311,7 +310,12 @@ const Bangumi: React.FC = () => {
                 <AnimeCardSkeleton key={`skeleton-${i}`} />
               ))}
           </div>
-        </InfiniteScroll>
+          {/* 无限滚动哨兵：进入视口时加载下一页 */}
+          <div
+            ref={sentinelRef}
+            aria-hidden
+          />
+        </div>
       )}
     </div>
   );

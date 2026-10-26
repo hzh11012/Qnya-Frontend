@@ -23,8 +23,9 @@ const DISGUISE_FAVICON =
 
 /** 伪装成在线文档的整页遮罩：跟随站点深/浅主题，内容为真实文字而非占位骨架 */
 const DisguisePage = () => {
-  // 挂载（即触发伪装）时刻的真实时间，作为「最近编辑」展示
-  const now = new Date();
+  // 挂载（即触发伪装）时刻的真实时间，作为「最近编辑」展示。
+  // useState 初始化器里取快照，避免渲染期调用不纯的 new Date()
+  const [now] = useState(() => new Date());
   const editTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
   return (

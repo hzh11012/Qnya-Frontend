@@ -21,7 +21,7 @@ interface UsePagedListOptions<T> {
 /**
  * 无限滚动分页列表 Hook：
  * 封装 useInfiniteQuery 的「已取条数 < total 则还有下一页」判断、
- * 多页数据扁平化与 fetchMore 防重入，供无限滚动组件（react-infinite-scroll-component）使用
+ * 多页数据扁平化与 fetchMore 防重入，配合 use-infinite-scroll 哨兵触发翻页
  */
 const usePagedList = <T>({
   queryKey,

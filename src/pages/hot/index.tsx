@@ -1,4 +1,3 @@
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import Exception from '@/components/custom/exception';
 import PageTitle from '@/components/custom/page-title';
@@ -7,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getClientList } from '@/apis/anime';
 import type { ClientAnimeItem } from '@/apis/anime';
 import { usePagedList } from '@/hooks/use-paged-list';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { getStatusText } from '@/lib/anime';
 import CoverImage from '@/components/custom/cover-image';
 
@@ -77,6 +77,11 @@ const Index = () => {
       fetchPage: page => getClientList({ page, pageSize: PAGE_SIZE, sort: 1 })
     });
 
+  const sentinelRef = useInfiniteScroll(
+    fetchMore,
+    !hasNextPage || isFetchingNextPage
+  );
+
   if (isPending) {
     return (
       <div className='my-4 md:my-8'>
@@ -96,32 +101,27 @@ const Index = () => {
   return (
     <div className='my-4 md:my-8'>
       <PageTitle className='mb-3 md:mb-4'>热门动漫排行</PageTitle>
-      <InfiniteScroll
-        // 组件默认给容器加内联 overflow: auto，会撑出滚动条并裁剪 hover 放大的卡片，
-        // 覆盖为 visible（style 会 merge 且在默认值之后，必定生效）
-        style={{ overflow: 'visible' }}
-        dataLength={list.length}
-        next={fetchMore}
-        hasMore={!!hasNextPage}
-        loader={''}
-      >
-        <div className={HOT_GRID_CLASS}>
-          {list.map(item => (
-            <HotCard
-              key={item.id}
-              item={item}
-            />
-          ))}
-          {isFetchingNextPage && (
-            <>
-              <HotCardSkeleton />
-              <HotCardSkeleton />
-              <HotCardSkeleton />
-              <HotCardSkeleton />
-            </>
-          )}
-        </div>
-      </InfiniteScroll>
+      <div className={HOT_GRID_CLASS}>
+        {list.map(item => (
+          <HotCard
+            key={item.id}
+            item={item}
+          />
+        ))}
+        {isFetchingNextPage && (
+          <>
+            <HotCardSkeleton />
+            <HotCardSkeleton />
+            <HotCardSkeleton />
+            <HotCardSkeleton />
+          </>
+        )}
+      </div>
+      {/* 无限滚动哨兵：进入视口时加载下一页 */}
+      <div
+        ref={sentinelRef}
+        aria-hidden
+      />
     </div>
   );
 };
