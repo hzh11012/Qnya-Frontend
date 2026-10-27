@@ -346,7 +346,7 @@ const HistoryCard: React.FC<{ item: MineHistoryItem }> = ({ item }) => {
       title={item.name}
       image={item.banner}
       remark={
-        item.episode
+        item.episode != null
           ? `第${item.episode}话 ${item.videoTitle ?? ''}`.trim()
           : undefined
       }

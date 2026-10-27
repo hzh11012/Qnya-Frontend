@@ -270,7 +270,7 @@ const Index = () => {
                 image={item.banner ?? ''}
                 tip={getStatusText(item)}
                 remark={
-                  item.episode
+                  item.episode != null
                     ? `看到第${item.episode}话 ${formatProgress(item.time ?? 0)}`
                     : '尚未观看'
                 }
