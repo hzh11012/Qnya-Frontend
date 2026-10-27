@@ -5,6 +5,7 @@ import {
 } from 'react-router-dom';
 import { createLazyComponent } from '@/lib/utils';
 import Exception from '@/components/custom/exception';
+import Loading from '@/components/custom/loading';
 import Layout from '@/layout';
 import {
   RequireAuth,
@@ -15,6 +16,8 @@ import { AuthProvider } from '@/components/custom/auth/auth-provider';
 
 const staticRoutes: RouteObject[] = [
   {
+    // 路由模块 lazy 加载期间的全屏兜底（同时消除 HydrateFallback 警告）
+    hydrateFallbackElement: <Loading />,
     element: (
       <AuthProvider>
         <Outlet />
