@@ -56,6 +56,12 @@ const staticRoutes: RouteObject[] = [
         ]
       },
       {
+        path: '/download',
+        // 客户端下载/宣发页：无需登录，独立于主布局（游客与已登录用户都可访问）
+        errorElement: <Exception type='error' />,
+        lazy: createLazyComponent(() => import('@/pages/download/index'))
+      },
+      {
         path: '/',
         // 前台整站需登录；未登录渲染 403 承载页（提供登录入口）
         Component: () => (

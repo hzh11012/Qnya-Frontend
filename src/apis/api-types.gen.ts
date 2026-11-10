@@ -307,6 +307,180 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/admin/app-releases/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          pageSize?: number;
+          platform?: 'android' | 'windows' | 'ios' | 'macos';
+          sort?: 'createdAt';
+          order?: 'asc' | 'desc';
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                items: {
+                  /** Format: uuid */
+                  id: string;
+                  versionCode: number | null;
+                  versionName: string;
+                  /** @enum {string} */
+                  platform: 'android' | 'windows' | 'ios' | 'macos';
+                  url: string;
+                  changelog: string;
+                  /** Format: date-time */
+                  createdAt: string;
+                }[];
+                total: number;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': {
+            versionName: string;
+            /**
+             * @default android
+             * @enum {string}
+             */
+            platform?: 'android' | 'windows' | 'ios' | 'macos';
+            url: string;
+            /** @default  */
+            changelog?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/app-releases/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': {
+            versionName: string;
+            /** @enum {string} */
+            platform: 'android' | 'windows' | 'ios' | 'macos';
+            url: string;
+            /** @default  */
+            changelog?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+            };
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/admin/collections/': {
     parameters: {
       query?: never;
@@ -2550,6 +2724,53 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/app/latest': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          platform?: 'android' | 'windows' | 'ios' | 'macos';
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                versionCode: number | null;
+                versionName: string;
+                url: string;
+                changelog: string;
+              } | null;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/auth/me': {
     parameters: {
       query?: never;
@@ -3403,6 +3624,14 @@ export interface paths {
                 cover: string;
                 /** @enum {string} */
                 status: 'upcoming' | 'airing' | 'completed';
+                /** @enum {string} */
+                type: 'movie' | 'japanese' | 'american' | 'chinese' | 'adult';
+                year: number;
+                /** @enum {string} */
+                month: 'january' | 'april' | 'july' | 'october';
+                director: string;
+                cv: string;
+                tags: string[];
                 avgScore: number;
                 scoreCount: number;
                 playCount: number;

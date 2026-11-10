@@ -172,6 +172,21 @@
   );
 }
 
+/* 网点纸（漫画分镜用）：中心密、边缘淡出 */
+@utility bg-dots {
+  background-image: radial-gradient(
+    circle,
+    var(--border) 1.1px,
+    transparent 1.6px
+  );
+  background-size: 12px 12px;
+  mask-image: radial-gradient(
+    ellipse 75% 70% at 50% 45%,
+    black 30%,
+    transparent 78%
+  );
+}
+
 @keyframes drift {
   from {
     background-position: 0 0;
@@ -195,6 +210,17 @@
   100% {
     opacity: 0;
     transform: translate(var(--fly), -50%);
+  }
+}
+
+/* 面板内弹幕横穿：配合 @container 使用（100cqw = 面板宽度，100% = 弹幕自身宽度），
+   元素以 left-full 定位在面板右缘外，动画结束时恰好完全离开左缘 */
+@keyframes danmaku-panel {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100cqw - 100%));
   }
 }
 
