@@ -3046,6 +3046,7 @@ export interface paths {
                   description: string;
                   remark: string;
                   cover: string;
+                  banner: string;
                   status: string;
                   type: string;
                   director: string;
@@ -3122,6 +3123,7 @@ export interface paths {
                   description: string;
                   remark: string;
                   cover: string;
+                  banner: string;
                   status: string;
                   type: string;
                   director: string;
@@ -3674,6 +3676,7 @@ export interface paths {
                   playCount: number;
                   collectionCount: number;
                   avgScore: number;
+                  scoreCount: number;
                 }[];
                 recommendations: {
                   /** Format: uuid */
@@ -3691,6 +3694,7 @@ export interface paths {
                   playCount: number;
                   collectionCount: number;
                   avgScore: number;
+                  scoreCount: number;
                 }[];
               };
             };
@@ -4059,6 +4063,7 @@ export interface paths {
                   description: string;
                   remark: string;
                   cover: string;
+                  banner: string;
                   status: string;
                   type: string;
                   director: string;
