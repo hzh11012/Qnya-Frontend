@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '@/components/custom/logo';
 import { useForm, useWatch } from 'react-hook-form';
-import { LineShadowText } from '@/components/ui/line-shadow-text';
 import { Button } from '@/components/ui/button';
 import { LoginForm } from '@/pages/login/login-form';
 import { useDocumentTitle } from '@/hooks/use-document-title';
@@ -61,17 +60,14 @@ const Login: React.FC = () => {
       <LoginBackground />
       <LoginFootnotes />
       <FlyDanmakuLayer flies={flies} />
-      <div className='relative my-auto flex w-[calc(100%-2rem)] max-w-87.5 flex-col pb-12'>
-        <div className='animate-fade-up mt-8 flex items-center gap-3.5'>
+      <div className='relative my-auto flex w-[calc(100%-2rem)] max-w-87.5 flex-col pb-18'>
+        <div className='animate-fade-up'>
           <Logo
-            type='favicon'
-            className='animate-float size-12'
+            type='logo'
+            className='animate-float w-auto h-24 -ml-6.5'
           />
-          <h3 className='font-display font-semibold text-primary text-5xl'>
-            Q<LineShadowText className='italic'>nya</LineShadowText>
-          </h3>
         </div>
-        <div className='animate-fade-up mt-10 flex items-center gap-3 [animation-delay:90ms]'>
+        <div className='animate-fade-up mt-6 flex items-center gap-3 [animation-delay:90ms]'>
           <div
             aria-hidden
             className='h-px w-10 bg-linear-to-r from-primary/60 to-transparent'

@@ -202,12 +202,12 @@ const DownloadPage: React.FC = () => {
         aria-hidden
         className='pointer-events-none absolute inset-0 overflow-hidden'
       >
-        <div className='absolute inset-0 bg-dots opacity-30 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,black,transparent_75%)]' />
+        <div className='absolute inset-0 bg-dots opacity-30 mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,black,transparent_75%)]' />
         {/* 两簇同心圆盘：呼应屏幕里的网点，图形化而不喧宾 */}
         <div className='absolute -right-28 -top-32 size-96 rounded-full border border-primary/10' />
-        <div className='absolute -right-20 -top-24 size-72 rounded-full bg-primary/[0.05]' />
-        <div className='absolute -left-24 bottom-[-4rem] size-64 rounded-full border border-primary/10' />
-        <div className='absolute -left-16 bottom-[-2.5rem] size-48 rounded-full bg-primary/[0.05]' />
+        <div className='absolute -right-20 -top-24 size-72 rounded-full bg-primary/5' />
+        <div className='absolute -left-24 -bottom-16 size-64 rounded-full border border-primary/10' />
+        <div className='absolute -left-16 -bottom-10 size-48 rounded-full bg-primary/5' />
         <Sparkle
           aria-hidden
           className='absolute left-[16%] top-[24%] size-4 animate-pulse text-primary/40'
@@ -218,9 +218,9 @@ const DownloadPage: React.FC = () => {
           className='absolute right-[18%] top-[58%] size-3 animate-pulse text-primary/40'
           style={{ animationDelay: '0.8s' }}
         />
-        <div className='absolute left-[28%] top-[16%] h-[3px] w-44 -rotate-12 rounded-full bg-foreground/10' />
-        <div className='absolute right-[30%] top-[30%] h-[3px] w-56 -rotate-12 rounded-full bg-foreground/10' />
-        <div className='absolute bottom-[18%] left-[42%] h-[3px] w-48 -rotate-12 rounded-full bg-foreground/10' />
+        <div className='absolute left-[28%] top-[16%] h-0.75 w-44 -rotate-12 rounded-full bg-foreground/10' />
+        <div className='absolute right-[30%] top-[30%] h-0.75 w-56 -rotate-12 rounded-full bg-foreground/10' />
+        <div className='absolute bottom-[18%] left-[42%] h-0.75 w-48 -rotate-12 rounded-full bg-foreground/10' />
       </div>
 
       {/* 顶栏：返回入口 + 主题切换 */}
@@ -231,7 +231,7 @@ const DownloadPage: React.FC = () => {
         >
           <Logo
             type='favicon'
-            className='size-9'
+            className='size-10'
           />
         </Link>
         <div className='flex items-center gap-3'>

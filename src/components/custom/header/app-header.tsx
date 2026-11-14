@@ -69,7 +69,7 @@ const AppHeader: React.FC<React.ComponentProps<typeof Header>> = ({
         />
         <Logo
           type='logo'
-          className='w-auto h-8 hidden md:block'
+          className='w-auto h-12 -ml-2 hidden md:block'
         />
       </HeaderLeft>
       <HeaderRight className='pl-0 items-center'>
