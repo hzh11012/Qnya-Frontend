@@ -4193,6 +4193,7 @@ export interface paths {
                   name: string;
                   description: string;
                   cover: string;
+                  remark: string;
                   status: string;
                   type: string;
                   director: string;
