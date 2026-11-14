@@ -4135,6 +4135,8 @@ export interface paths {
                   description: string;
                   cover: string;
                   animeCount: number;
+                  covers: string[];
+                  watchedCount: number;
                 }[];
                 total: number;
               };
