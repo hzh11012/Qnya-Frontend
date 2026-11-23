@@ -77,6 +77,7 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 import { usePlayTheme } from '@/hooks/use-play-theme';
 import { useSettings } from '@/lib/settings';
 import { cn } from '@/lib/utils';
+import type { ShareInfo } from '@/lib/share';
 
 /** 弹幕存储的字符串 mode 与 artplayer 数值 mode 互转（与播放页一致） */
 const toPluginMode = (mode: 'scroll' | 'top' | 'bottom') =>
@@ -1069,11 +1070,28 @@ const RoomView: React.FC<{ roomId: string }> = ({ roomId }) => {
         }
       : null;
 
+  /**
+   * 邀请文案：header 的分享按钮与聊天页「邀请」共用同一份，两处口径才不会打架。
+   * 语气跟播放页的「我在看《X》第N话，一起来追番吧！」保持一致（房主与成员都在房里，
+   * 所以用「我在……看」而不是「我开了个房」）；私人房不把密码写进去——房主可能随时改、
+   * 也不该留在对方的转发记录里，只提示「单独问我要」，让对方知道还有一道门。
+   */
+  const inviteShare: ShareInfo = {
+    title: nowPlaying
+      ? `我在 Qnya 放映室看《${nowPlaying.animeName}》${
+          nowPlaying.episode ? `第${nowPlaying.episode}话` : ''
+        }，一起来看吧！`
+      : '我在 Qnya 放映室等你，一起来看番吧！',
+    note:
+      state.visibility === 'private' ? '私人房间，密码单独问我要' : undefined,
+    successText: '邀请文案已复制，发给好友吧'
+  };
+
   return (
     <>
       {/* 路由切换重置窗口滚动条（与播放页一致） */}
       <ScrollRestoration />
-      <PlayHeader />
+      <PlayHeader share={inviteShare} />
       <PlayShell
         sidebarClassName='min-h-80 grow lg:min-h-0'
         player={
@@ -1198,6 +1216,7 @@ const RoomView: React.FC<{ roomId: string }> = ({ roomId }) => {
                   pending={visibilityPending}
                   onToggleVisibility={handleOpenVisibility}
                   onKick={handleKickMember}
+                  share={inviteShare}
                 />
 
                 {/* 公告跟聊天放一起：边看边说的时候也能看到房主写的话 */}

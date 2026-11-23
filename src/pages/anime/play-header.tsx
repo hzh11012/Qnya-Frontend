@@ -14,16 +14,13 @@ import IconButton from '@/components/custom/icon-button';
 import IconMenu from '@/components/custom/icon-menu';
 import { useSettings, updateSettings } from '@/lib/settings';
 import { useNavPosition } from '@/lib/nav-position';
+import { copyShareText, type ShareInfo } from '@/lib/share';
 import { toast } from 'sonner';
 
-/** 分享当前播放页：复制链接到剪贴板 */
-const handleShare = async () => {
-  try {
-    await navigator.clipboard.writeText(window.location.href);
-    toast.success('链接已复制，快去分享吧');
-  } catch {
-    toast.error('复制失败，请手动复制地址栏链接');
-  }
+/** 拿不到具体内容时的兜底文案（如番剧详情还在加载） */
+const DEFAULT_SHARE: ShareInfo = {
+  title: '我在 Qnya 看番，一起来吧！',
+  successText: '分享文案已复制，粘贴给好友即可'
 };
 
 /** 播放页主题可选值（提升到模块级，避免每次渲染重建） */
@@ -58,12 +55,24 @@ const PlayThemeMenu: React.FC = () => {
  *
  * @param showShare 是否启用「分享当前页」：过渡页（正在开场）的地址是一次性的，
  *   复制出去对方打开只会被退回选片页，所以那里把分享置灰不可点
+ * @param share 分享文案上下文：番剧页带「番名 + 集数」，放映室带房间信息。
+ *   不传则用通用推荐语（守门页、加载态这类拿不到内容的场景）
  */
-const PlayHeader: React.FC<{ showShare?: boolean }> = ({
-  showShare = true
-}) => {
+const PlayHeader: React.FC<{
+  showShare?: boolean;
+  share?: ShareInfo;
+}> = ({ showShare = true, share }) => {
   const navigate = useNavigate();
   const { canBack, canForward } = useNavPosition();
+
+  const handleShare = async () => {
+    const info = share ?? DEFAULT_SHARE;
+    if (await copyShareText(info)) {
+      toast.success(info.successText ?? '分享文案已复制，粘贴给好友即可');
+    } else {
+      toast.error('复制失败，请手动复制地址栏链接');
+    }
+  };
 
   return (
     <header className='flex h-12.5 flex-none items-center justify-between border-b border-border px-4 select-none md:px-5'>

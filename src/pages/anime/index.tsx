@@ -393,7 +393,14 @@ const Anime: React.FC = () => {
       {/* 路由切换（如切集）重置窗口滚动条；前进/后退时按位置恢复。
           桌面端侧栏为内部滚动容器，不受影响 */}
       <ScrollRestoration />
-      <PlayHeader />
+      <PlayHeader
+        share={{
+          // 与 Qnya-Mobile 播放页的分享文案保持一致：剧场版之类的 episode 为 0 时不带集数
+          title: `我在看《${detail.name}》${
+            detail.video.episode > 0 ? `第${detail.video.episode}话` : ''
+          }，一起来追番吧！`
+        }}
+      />
       <PlayShell
         player={
           <Player

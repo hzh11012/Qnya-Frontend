@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import type { WatchRoomMember } from '@/apis/watch-room';
+import { copyShareText, type ShareInfo } from '@/lib/share';
 import { cn } from '@/lib/utils';
 
 interface RoomChatHeaderProps {
@@ -24,6 +25,8 @@ interface RoomChatHeaderProps {
   onToggleVisibility: (next: boolean) => void;
   /** 房主从头像菜单移出成员（确认框由外层弹） */
   onKick: (member: WatchRoomMember) => void;
+  /** 邀请文案：与 header 分享按钮共用同一份，由房间页统一组装 */
+  share: ShareInfo;
 }
 
 /** 成员头像：高亮「自己」；房主另加一个右下角标识，房主可点头像开菜单，其余人是静态展示 */
@@ -111,20 +114,16 @@ const RoomChatHeader: React.FC<RoomChatHeaderProps> = ({
   isOwner,
   pending,
   onToggleVisibility,
-  onKick
+  onKick,
+  share
 }) => {
   const isPublic = visibility === 'public';
   const Icon = isPublic ? Globe : Lock;
 
   const handleInvite = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success(
-        isPublic
-          ? '房间链接已复制，发给好友一起看'
-          : '链接已复制，记得把密码也告诉好友'
-      );
-    } catch {
+    if (await copyShareText(share)) {
+      toast.success(share.successText ?? '邀请文案已复制，发给好友吧');
+    } else {
       toast.error('复制失败，请手动复制地址栏链接');
     }
   };
