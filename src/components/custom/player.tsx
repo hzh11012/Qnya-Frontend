@@ -211,6 +211,9 @@ const Player: React.FC<PlayerProps> = ({
       airplay: false,
       lock: true,
       isLive: false,
+      // 移动端手势：画面上下滑音量、左右滑进度。成员端没有播放权，进度条本身已
+      // pointer-events: none 挡掉，但画面上的滑动是另一条链路，必须显式关掉
+      gesture: !viewerMode,
       fastForward: !viewerMode,
       container,
       icons: {
@@ -251,15 +254,19 @@ const Player: React.FC<PlayerProps> = ({
     });
 
     // 只读观看：保留播放/暂停图标（成员也能看出当前是播还是停），但不可点，
-    // 并拦下画面上的点击。artplayer 在根节点监听 click/dblclick 调 art.toggle()，
-    // 而 toggle 是只读属性（不能覆写，赋值会直接抛错打断渲染），只能在捕获阶段
-    // 截住落到画面上的事件；控制栏与弹层仍可正常交互。
+    // 并拦下画面上的点击。artplayer 在 $video 上按单击/连击分发：单击 emit('click')
+    // 让控制栏显隐，桌面端还会 toggle() 播放态；连击切全屏。
+    // 成员端想要的是「能唤起控制栏、不能改播放态」，所以拦下事件后再手动把
+    // 控制栏显隐那一半补上——只 stopPropagation 会让控制栏再也出不来
     const VIEWER_INTERACTIVE =
       '.art-bottom, .art-settings, .art-notice, .art-info, .art-contextmenus';
     const blockSurfaceClick = (event: Event) => {
       const target = event.target as HTMLElement | null;
       if (target?.closest(VIEWER_INTERACTIVE)) return;
       event.stopPropagation();
+      // 单击补回「唤起控制栏」这一半行为：artplayer 的 show 会重置它内部的
+      // 隐藏计时器，之后仍按播放时长自动收起，不会一直挂着挡住画面
+      if (event.type === 'click') art.controls.show = true;
     };
 
     if (viewerMode) {
