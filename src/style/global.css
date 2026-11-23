@@ -61,6 +61,15 @@ body,
   padding: 0 20px !important;
 }
 
+/**
+ * 放映室成员端（viewerMode）：进度条只做展示，不能拖动。
+ * artplayer 自带 .art-bottom:hover .art-progress-indicator { transform: scale(1) }，
+ * 鼠标一移到控制栏就把当前进度的圆点顶出来，看着像“可以拖”，这里压掉
+ */
+[data-viewer-mode='true'] .art-progress-indicator {
+  transform: scale(0) !important;
+}
+
 .art-video-player .art-controls-center {
   min-width: 0;
 }

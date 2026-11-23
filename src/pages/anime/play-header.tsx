@@ -9,14 +9,9 @@ import {
   Share2,
   Sun
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import IconButton from '@/components/custom/icon-button';
+import IconMenu from '@/components/custom/icon-menu';
 import { useSettings, updateSettings } from '@/lib/settings';
 import { useNavPosition } from '@/lib/nav-position';
 import { toast } from 'sonner';
@@ -45,59 +40,28 @@ const PlayThemeMenu: React.FC = () => {
     playTheme === 'light' ? Sun : playTheme === 'dark' ? Moon : Monitor;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type='button'
-          className={cn(
-            'flex cursor-pointer items-center justify-center rounded-sm size-8 text-foreground',
-            'transition-colors duration-200 hover:bg-border'
-          )}
-          title='播放页主题'
-        >
-          <ActiveIcon size={18} />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className='w-fit'
-        align='end'
-      >
-        {PLAY_THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
-          <DropdownMenuItem
-            key={value}
-            className={cn(
-              'cursor-pointer',
-              playTheme === value ? 'text-primary' : 'text-foreground'
-            )}
-            onClick={() => updateSettings({ playTheme: value })}
-          >
-            <Icon />
-            {label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <IconMenu
+      title='播放页主题'
+      icon={ActiveIcon}
+      items={PLAY_THEME_OPTIONS.map(({ value, label, icon }) => ({
+        icon,
+        label,
+        active: playTheme === value,
+        onClick: () => updateSettings({ playTheme: value })
+      }))}
+    />
   );
 };
 
-/** header 上的图标按钮（后退/前进共用），不可用时禁用 */
-const HeaderIcon: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
-  className,
-  ...props
-}) => (
-  <button
-    type='button'
-    className={cn(
-      'flex cursor-pointer items-center justify-center rounded-sm size-8 text-foreground',
-      'transition-colors duration-200 hover:bg-border disabled:pointer-events-none disabled:opacity-40',
-      className
-    )}
-    {...props}
-  />
-);
-
-/** 播放页顶部 header：回到主界面 + 后退/前进（不可用时禁用） | 播放页主题 */
-const PlayHeader: React.FC = () => {
+/**
+ * 播放页顶部 header：回到主界面 + 后退/前进（不可用时禁用） | 播放页主题
+ *
+ * @param showShare 是否启用「分享当前页」：过渡页（正在开场）的地址是一次性的，
+ *   复制出去对方打开只会被退回选片页，所以那里把分享置灰不可点
+ */
+const PlayHeader: React.FC<{ showShare?: boolean }> = ({
+  showShare = true
+}) => {
   const navigate = useNavigate();
   const { canBack, canForward } = useNavPosition();
 
@@ -113,29 +77,30 @@ const PlayHeader: React.FC = () => {
           <House size={16} />
           <span className='hidden md:block'>回到主界面</span>
         </Button>
-        <HeaderIcon
+        <IconButton
           title='后退'
           disabled={!canBack}
           onClick={() => navigate(-1)}
         >
           <ChevronLeft size={18} />
-        </HeaderIcon>
-        <HeaderIcon
+        </IconButton>
+        <IconButton
           title='前进'
           disabled={!canForward}
           onClick={() => navigate(1)}
         >
           <ChevronRight size={18} />
-        </HeaderIcon>
+        </IconButton>
       </div>
       <div className='flex items-center gap-1'>
         <PlayThemeMenu />
-        <HeaderIcon
+        <IconButton
           title='分享'
+          disabled={!showShare}
           onClick={() => void handleShare()}
         >
           <Share2 size={18} />
-        </HeaderIcon>
+        </IconButton>
       </div>
     </header>
   );

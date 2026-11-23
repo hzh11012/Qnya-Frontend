@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   useParams,
   useNavigate,
@@ -34,29 +28,31 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 import FeedbackDialog, {
   type FeedbackFormValues
 } from '@/pages/anime/feedback-dialog';
-import Player from '@/components/custom/player';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import Player, { type PlayerHandle } from '@/components/custom/player';
+import IconMenu, { type IconMenuItem } from '@/components/custom/icon-menu';
+import PlayShell, {
+  PLAY_SIDEBAR_BODY_CLASS,
+  PLAY_SIDEBAR_DIVIDER_CLASS,
+  PLAY_SIDEBAR_HEADER_CLASS
+} from '@/components/custom/play-shell';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
 import { useSettings } from '@/lib/settings';
-import { applyTheme, useTheme } from '@/components/custom/theme-context';
+import { usePlayTheme } from '@/hooks/use-play-theme';
 import AnimeDescription from '@/pages/anime/anime-description';
 import AnimeEpisode from '@/pages/anime/anime-episode';
 import AnimeSideList from '@/pages/anime/anime-side-list';
 import PlayHeader from '@/pages/anime/play-header';
 import type { RatingFormValues } from '@/pages/anime/anime-rating';
 import {
-  ChevronLeft,
-  ChevronRight,
+  Clapperboard,
   EllipsisVertical,
   MessageSquareWarning,
   RefreshCcw
 } from 'lucide-react';
+import { useAuthStore } from '@/store/auth';
+import { getWatchRoomSocket } from '@/apis/watch-room-socket';
+import { ROOM_NAME_MAX } from '@/pages/watch-room/constants';
+import type { WatchRoomCreatingState } from '@/pages/watch-room/creating';
 
 /** 弹幕存储的字符串 mode 与 artplayer 数值 mode 互转 */
 const toPluginMode = (mode: 'scroll' | 'top' | 'bottom') =>
@@ -65,15 +61,39 @@ const toPluginMode = (mode: 'scroll' | 'top' | 'bottom') =>
 const toStorageMode = (mode: 0 | 1 | 2) =>
   ({ 0: 'scroll', 1: 'top', 2: 'bottom' })[mode] as 'scroll' | 'top' | 'bottom';
 
-const AnimeDropdownMenu: React.FC<{ animeId: string }> = ({ animeId }) => {
+const AnimeDropdownMenu: React.FC<{ detail: PlayDetail }> = ({ detail }) => {
   const navigate = useNavigate();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const user = useAuthStore(state => state.user);
+  // 建房要 user 及以上角色（游客会被服务端拒），没有权限就别给入口
+  const canCreateRoom = !!user && user.role !== 'guest';
 
   const { mutate: handleFeedback, isPending: feedbackLoading } = useMutation({
-    mutationFn: (values: FeedbackFormValues) => createFeedback(animeId, values)
+    mutationFn: (values: FeedbackFormValues) =>
+      createFeedback(detail.animeId, values)
   });
 
-  const menuItems = [
+  /** 用当前这集开场：房间名与过渡页封面都直接拿播放详情 */
+  const createRoom = () => {
+    // 先把 socket 连上，过渡页只需一次 ACK 往返
+    getWatchRoomSocket();
+    const state: WatchRoomCreatingState = {
+      name: `${detail.name} 第${detail.video.episode}话`.slice(
+        0,
+        ROOM_NAME_MAX
+      ),
+      videoId: detail.video.id,
+      animeName: detail.name,
+      episode: detail.video.episode,
+      cover: detail.cover
+    };
+    navigate('/watch-room/creating', { state });
+  };
+
+  const menuItems: IconMenuItem[] = [
+    ...(canCreateRoom
+      ? [{ icon: Clapperboard, label: '创建放映室', onClick: createRoom }]
+      : []),
     { icon: RefreshCcw, label: '重新加载', onClick: () => navigate(0) },
     {
       icon: MessageSquareWarning,
@@ -83,42 +103,19 @@ const AnimeDropdownMenu: React.FC<{ animeId: string }> = ({ animeId }) => {
   ];
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type='button'
-          className={cn(
-            'flex cursor-pointer items-center justify-center rounded-sm size-8 text-foreground',
-            'transition-colors duration-200 hover:bg-border'
-          )}
-          title='更多'
-        >
-          <EllipsisVertical size={18} />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className='w-fit'
-        align='end'
-      >
-        {menuItems.map(({ icon: Icon, label, onClick }) => (
-          <DropdownMenuItem
-            key={label}
-            className='cursor-pointer text-foreground'
-            onClick={onClick}
-          >
-            <Icon className='text-foreground' />
-            {label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-
+    <>
+      <IconMenu
+        title='更多'
+        icon={EllipsisVertical}
+        items={menuItems}
+      />
       <FeedbackDialog
         loading={feedbackLoading}
         open={feedbackOpen}
         onOpenChange={setFeedbackOpen}
         onSubmit={(values, cb) => handleFeedback(values, { onSuccess: cb })}
       />
-    </DropdownMenu>
+    </>
   );
 };
 
@@ -127,8 +124,7 @@ const Anime: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const [collapsed, setCollapsed] = useState(false);
-  const playerRef = useRef<{ getTime: () => number } | null>(null);
+  const playerRef = useRef<PlayerHandle>(null);
 
   // 续播进度：从 location.state 渲染期派生（跳转时携带，避免 detail 缓存 30s 导致
   // 续播到旧位置）。无明确集意图的入口（热门/专题/追番/搜索「立即观看」）在
@@ -250,17 +246,9 @@ const Anime: React.FC = () => {
   // 自动连播：开关读本地设置（默认开）；下一集 = 选集列表中 episode 大于当前集的最小者，
   // 复用 handleSelectVideo 切集（保存本集进度 + 下一集从头播），最后一集停在原地；
   // 1s 时间窗防抖（避免极少数浏览器 ended 重复触发导致重复切集，不阻翌重播再看完）
-  const { autoNext, playTheme } = useSettings();
-  const { resolvedTheme } = useTheme();
-
-  // 播放页主题独立于平台主题（如 B 站的播放窗口颜色模式）：
-  // 播放页不在主布局内（无侧栏/头部），挂载期间直接覆写根主题类，
-  // 离开时恢复；useLayoutEffect 保证首帧不闪错主题；
-  // resolvedTheme 变化（系统主题切换）时本 effect 会重跑，覆写不被全局逻辑冲掉
-  useLayoutEffect(() => {
-    applyTheme(playTheme === 'system' ? resolvedTheme : playTheme, false);
-    return () => applyTheme(resolvedTheme, false);
-  }, [playTheme, resolvedTheme]);
+  const { autoNext } = useSettings();
+  // 播放页主题独立于平台主题（如 B 站的播放窗口颜色模式），见 usePlayTheme
+  usePlayTheme();
   const lastEndedAtRef = useRef(0);
 
   /** 选集列表中当前集的下一集（episode 升序取紧邻的更大者），无则 null */
@@ -406,20 +394,8 @@ const Anime: React.FC = () => {
           桌面端侧栏为内部滚动容器，不受影响 */}
       <ScrollRestoration />
       <PlayHeader />
-      <div className='group flex flex-col lg:h-[calc(100vh-3.125rem)] lg:flex-row'>
-        {/* 播放器区域 */}
-        <div className='relative isolate bg-black flex-none lg:flex-1'>
-          {/* 收起/展开侧栏：hover 播放器时显示在右缘 */}
-          <div
-            className={cn(
-              'hidden lg:group-hover:flex absolute top-1/2 -translate-y-1/2 right-0 z-20',
-              'w-7 h-14 items-center justify-center rounded-l-sm cursor-pointer',
-              'bg-black/50 text-white'
-            )}
-            onClick={() => setCollapsed(value => !value)}
-          >
-            {collapsed ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-          </div>
+      <PlayShell
+        player={
           <Player
             ref={playerRef}
             url={detail.video.url}
@@ -437,55 +413,56 @@ const Anime: React.FC = () => {
             onEnded={handleEnded}
             onNearEnd={handleNearEnd}
           />
-        </div>
-
-        {/* 侧栏：移动端始终展示（收起按钮仅桌面可见，collapsed 在移动端无意义）；
-            桌面端受收起状态控制 */}
-        <div
-          className={cn(
-            'relative w-full lg:h-full lg:w-95 lg:flex-none border-l border-border bg-background flex flex-col',
-            collapsed && 'lg:hidden'
-          )}
-        >
-          <div className='min-h-12.5 border-b flex-none flex items-center justify-between px-5 text-base'>
-            简介
-            <AnimeDropdownMenu animeId={detail.animeId} />
-          </div>
-          <div className='py-5 flex-1 md:overflow-y-auto'>
-            <div className='px-5'>
-              <AnimeDescription
-                detail={detail}
-                isCollected={detail.isCollected}
-                isRating={detail.isRating}
-                onCollected={handleCollected}
-                ratingLoading={ratingLoading}
-                onRating={(values, cb) =>
-                  handleRating(values, { onSuccess: cb })
-                }
-              />
-              <hr className='my-5 border-border' />
-              <AnimeEpisode
-                detail={detail}
-                onSelectVideo={handleSelectVideo}
-              />
-              <hr className='my-5 border-border' />
+        }
+        sidebar={
+          <>
+            <div className={PLAY_SIDEBAR_HEADER_CLASS}>
+              简介
+              <AnimeDropdownMenu detail={detail} />
             </div>
-            <AnimeSideList
-              title={`${detail.seriesName} 系列`}
-              list={detail.series}
-              onAnimeClick={handleSelectVideo}
-              className='-my-2'
-            />
-            {!!detail.series.length && <hr className='my-5 border-border' />}
-            <AnimeSideList
-              list={detail.recommendations}
-              showRating
-              onAnimeClick={handleSelectVideo}
-              className='-my-2'
-            />
-          </div>
-        </div>
-      </div>
+            <div className={PLAY_SIDEBAR_BODY_CLASS}>
+              <div className='px-5'>
+                <AnimeDescription
+                  detail={detail}
+                  isCollected={detail.isCollected}
+                  isRating={detail.isRating}
+                  onCollected={handleCollected}
+                  ratingLoading={ratingLoading}
+                  onRating={(values, cb) =>
+                    handleRating(values, { onSuccess: cb })
+                  }
+                />
+                <hr className={PLAY_SIDEBAR_DIVIDER_CLASS} />
+                <AnimeEpisode
+                  detail={detail}
+                  onSelectVideo={handleSelectVideo}
+                />
+                {/* 系列/推荐都空时不留下孤零零的分隔线 */}
+                {(!!detail.series.length ||
+                  !!detail.recommendations.length) && (
+                  <hr className={PLAY_SIDEBAR_DIVIDER_CLASS} />
+                )}
+              </div>
+              <AnimeSideList
+                title={`${detail.seriesName} 系列`}
+                list={detail.series}
+                onAnimeClick={handleSelectVideo}
+                className='-my-2'
+              />
+              {/* 推荐为空时，系列下面也不该拖一条横线 */}
+              {!!detail.series.length && !!detail.recommendations.length && (
+                <hr className={PLAY_SIDEBAR_DIVIDER_CLASS} />
+              )}
+              <AnimeSideList
+                list={detail.recommendations}
+                showRating
+                onAnimeClick={handleSelectVideo}
+                className='-my-2'
+              />
+            </div>
+          </>
+        }
+      />
     </>
   );
 };

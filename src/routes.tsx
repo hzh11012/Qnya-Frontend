@@ -56,6 +56,40 @@ const staticRoutes: RouteObject[] = [
         ]
       },
       {
+        path: '/watch-room/creating',
+        // 建房过渡页：点卡立即转到这里，房间在后台异步创建（静态段优先于 /watch-room/:roomId）
+        element: (
+          <RequireRole minRole='user'>
+            <Outlet />
+          </RequireRole>
+        ),
+        errorElement: <Exception type='error' />,
+        children: [
+          {
+            index: true,
+            lazy: createLazyComponent(
+              () => import('@/pages/watch-room/creating')
+            )
+          }
+        ]
+      },
+      {
+        path: '/watch-room/:roomId',
+        // 放映室房间页：布局与播放页一致（独立于主布局，左播放器右信息栏）
+        element: (
+          <RequireRole minRole='user'>
+            <Outlet />
+          </RequireRole>
+        ),
+        errorElement: <Exception type='error' />,
+        children: [
+          {
+            index: true,
+            lazy: createLazyComponent(() => import('@/pages/watch-room/room'))
+          }
+        ]
+      },
+      {
         path: '/download',
         // 客户端下载/宣发页：无需登录，独立于主布局（游客与已登录用户都可访问）
         errorElement: <Exception type='error' />,
@@ -101,6 +135,16 @@ const staticRoutes: RouteObject[] = [
             path: 'mine',
             // 个人中心仅需登录（游客角色可看/改资料，追番/历史区块按角色隐藏）
             lazy: createLazyComponent(() => import('@/pages/mine/index'))
+          },
+          {
+            path: 'watch-room/new',
+            // 建放映室是独立选片页（静态段优先于 /watch-room/:roomId，不会被当成房间号）
+            lazy: createLazyComponent(() => import('@/pages/watch-room/create'))
+          },
+          {
+            path: 'watch-room',
+            // 放映室大厅：登录即可浏览公开房间（加入/创建需 user 角色，由服务端校验）
+            lazy: createLazyComponent(() => import('@/pages/watch-room/index'))
           },
           {
             path: 'settings',

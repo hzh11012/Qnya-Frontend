@@ -1,4 +1,10 @@
-import { Compass, Flame, Shapes, SquareUserRound } from 'lucide-react';
+import {
+  Compass,
+  Clapperboard,
+  Flame,
+  Shapes,
+  SquareUserRound
+} from 'lucide-react';
 
 const links = [
   {
@@ -10,6 +16,11 @@ const links = [
     title: '专题',
     icon: Shapes,
     url: '/topic'
+  },
+  {
+    title: '放映',
+    icon: Clapperboard,
+    url: '/watch-room'
   },
   {
     title: '热门',

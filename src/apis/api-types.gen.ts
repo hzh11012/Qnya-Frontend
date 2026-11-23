@@ -2724,6 +2724,516 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/admin/watch-room/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          pageSize?: number;
+          visibility?: 'public' | 'private';
+          keyword?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                items: {
+                  /** Format: uuid */
+                  id: string;
+                  name: string;
+                  announcement: string | null;
+                  /** @enum {string} */
+                  visibility: 'public' | 'private';
+                  /** Format: uuid */
+                  ownerId: string;
+                  owner: {
+                    /** Format: uuid */
+                    userId: string;
+                    nickname: string;
+                    avatar: string | null;
+                  };
+                  memberCount: number;
+                  maxMembers: number;
+                  isPlaying: boolean;
+                  currentVideo: {
+                    /** Format: uuid */
+                    videoId: string;
+                    title: string;
+                    episode: number;
+                    /** Format: uuid */
+                    animeId: string;
+                    animeName: string;
+                    animeCover: string;
+                  } | null;
+                  /** Format: date-time */
+                  createdAt: string;
+                }[];
+                total: number;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/watch-room/{roomId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          roomId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                /** Format: uuid */
+                roomId: string;
+              };
+            };
+          };
+        };
+        /** @description Default Response */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          roomId: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': {
+            name?: string;
+            announcement?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                announcement: string | null;
+                /** @enum {string} */
+                visibility: 'public' | 'private';
+                /** Format: uuid */
+                ownerId: string;
+                owner: {
+                  /** Format: uuid */
+                  userId: string;
+                  nickname: string;
+                  avatar: string | null;
+                };
+                memberCount: number;
+                maxMembers: number;
+                isPlaying: boolean;
+                currentVideo: {
+                  /** Format: uuid */
+                  videoId: string;
+                  title: string;
+                  episode: number;
+                  /** Format: uuid */
+                  animeId: string;
+                  animeName: string;
+                  animeCover: string;
+                } | null;
+                /** Format: date-time */
+                createdAt: string;
+              };
+            };
+          };
+        };
+        /** @description Default Response */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+      };
+    };
+    trace?: never;
+  };
   '/api/app/latest': {
     parameters: {
       query?: never;
@@ -4213,6 +4723,658 @@ export interface paths {
                   }[];
                 }[];
               };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/client/watch-room/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          pageSize?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                items: {
+                  /** Format: uuid */
+                  id: string;
+                  name: string;
+                  /** Format: uuid */
+                  ownerId: string;
+                  owner: {
+                    /** Format: uuid */
+                    userId: string;
+                    nickname: string;
+                    avatar: string | null;
+                  };
+                  memberCount: number;
+                  maxMembers: number;
+                  isPlaying: boolean;
+                  currentVideo: {
+                    /** Format: uuid */
+                    videoId: string;
+                    title: string;
+                    episode: number;
+                    /** Format: uuid */
+                    animeId: string;
+                    animeName: string;
+                    animeCover: string;
+                  } | null;
+                  /** Format: date-time */
+                  createdAt: string;
+                }[];
+                total: number;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/client/watch-room/current': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                announcement: string | null;
+                /** @enum {string} */
+                visibility: 'public' | 'private';
+                /** Format: uuid */
+                ownerId: string;
+                owner: {
+                  /** Format: uuid */
+                  userId: string;
+                  nickname: string;
+                  avatar: string | null;
+                };
+                memberCount: number;
+                maxMembers: number;
+                playback: {
+                  /** Format: uuid */
+                  videoId: string | null;
+                  position: number;
+                  isPlaying: boolean;
+                  revision: number;
+                  serverTime: number;
+                };
+                currentVideo: {
+                  /** Format: uuid */
+                  videoId: string;
+                  title: string;
+                  episode: number;
+                  /** Format: uuid */
+                  animeId: string;
+                  animeName: string;
+                  animeCover: string;
+                } | null;
+                /** Format: date-time */
+                createdAt: string;
+                members: {
+                  /** Format: uuid */
+                  userId: string;
+                  nickname: string;
+                  avatar: string | null;
+                  /** @enum {string} */
+                  role: 'owner' | 'member';
+                  /** Format: date-time */
+                  joinedAt: string;
+                }[];
+                me: {
+                  /** @enum {string} */
+                  role: 'owner' | 'member';
+                };
+              } | null;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/client/watch-room/{roomId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          roomId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                announcement: string | null;
+                /** @enum {string} */
+                visibility: 'public' | 'private';
+                /** Format: uuid */
+                ownerId: string;
+                owner: {
+                  /** Format: uuid */
+                  userId: string;
+                  nickname: string;
+                  avatar: string | null;
+                };
+                memberCount: number;
+                maxMembers: number;
+                playback: {
+                  /** Format: uuid */
+                  videoId: string | null;
+                  position: number;
+                  isPlaying: boolean;
+                  revision: number;
+                  serverTime: number;
+                };
+                currentVideo: {
+                  /** Format: uuid */
+                  videoId: string;
+                  title: string;
+                  episode: number;
+                  /** Format: uuid */
+                  animeId: string;
+                  animeName: string;
+                  animeCover: string;
+                } | null;
+                /** Format: date-time */
+                createdAt: string;
+              };
+            };
+          };
+        };
+        /** @description Default Response */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/client/watch-room/{roomId}/messages': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          pageSize?: number;
+        };
+        header?: never;
+        path: {
+          roomId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Default Response */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {number} */
+              code: 200;
+              message: string;
+              data: {
+                items: {
+                  /** Format: uuid */
+                  messageId: string;
+                  /** Format: uuid */
+                  roomId: string;
+                  /** @enum {string} */
+                  type: 'chat' | 'system';
+                  content: string;
+                  /** Format: date-time */
+                  createdAt: string;
+                  user?: {
+                    /** Format: uuid */
+                    userId: string;
+                    nickname: string;
+                    avatar: string | null;
+                  };
+                  system?: {
+                    /** @enum {string} */
+                    eventType:
+                      | 'member_joined'
+                      | 'member_left'
+                      | 'member_kicked'
+                      | 'room_updated'
+                      | 'video_changed';
+                    operator?: {
+                      /** Format: uuid */
+                      userId: string;
+                      nickname: string;
+                      avatar: string | null;
+                    };
+                    target?: {
+                      /** Format: uuid */
+                      userId: string;
+                      nickname: string;
+                      avatar: string | null;
+                    };
+                  };
+                }[];
+                total: number;
+              };
+            };
+          };
+        };
+        /** @description Default Response */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
+            };
+          };
+        };
+        /** @description Default Response */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              code: number;
+              message: string;
+              /** @enum {string} */
+              errorCode?:
+                | 'ROOM_NOT_FOUND'
+                | 'ROOM_FULL'
+                | 'ROOM_PRIVATE'
+                | 'ROOM_PASSWORD_INVALID'
+                | 'ROOM_BANNED'
+                | 'ROOM_PERMISSION_DENIED'
+                | 'ROOM_MEMBER_NOT_FOUND'
+                | 'VIDEO_NOT_FOUND'
+                | 'VIDEO_UNAVAILABLE'
+                | 'SESSION_INVALID'
+                | 'RATE_LIMITED'
+                | 'INVALID_PARAMS'
+                | 'INTERNAL_ERROR';
             };
           };
         };
