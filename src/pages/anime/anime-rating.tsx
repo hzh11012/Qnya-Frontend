@@ -3,15 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import FormDialog from '@/components/custom/form-dialog';
 import {
   Form,
   FormControl,
@@ -66,86 +58,77 @@ const AnimeRating: React.FC<AnimeRatingProps> = ({
   };
 
   return (
-    <Dialog
+    <FormDialog
       open={open}
       onOpenChange={setOpen}
+      trigger={children}
+      title='动漫评分'
+      description='请发表你对这部作品的评分'
+      confirmText='发表短评'
+      confirmDisabled={!score || !content}
+      loading={loading}
+      onSubmit={form.handleSubmit(handleSubmit)}
     >
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className='bg-background/90'>
-        <DialogHeader>
-          <DialogTitle className='sm:text-left'>动漫评分</DialogTitle>
-          <DialogDescription>请发表你对这部作品的评分</DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form
-            className='space-y-6'
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <FormField
-              control={form.control}
-              name='score'
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <RadioGroup
-                      className='inline-flex gap-0'
-                      onValueChange={field.onChange}
+      <Form {...form}>
+        <FormField
+          control={form.control}
+          name='score'
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <RadioGroup
+                  className='inline-flex gap-0'
+                  // 受控：提交后 form.reset() 归零，DOM 里的选中值也得跟着清，
+                  // 否则再点同一颗星不触发 change，分数永远选不上
+                  value={field.value ?? ''}
+                  onValueChange={field.onChange}
+                >
+                  {['1', '2', '3', '4', '5'].map(value => (
+                    <label
+                      key={value}
+                      className='relative cursor-pointer rounded-sm px-0.5 outline-none'
+                      onMouseEnter={() => setHoverRating(value)}
+                      onMouseLeave={() => setHoverRating('')}
                     >
-                      {['1', '2', '3', '4', '5'].map(value => (
-                        <label
-                          key={value}
-                          className='relative cursor-pointer rounded-sm px-0.5 outline-none'
-                          onMouseEnter={() => setHoverRating(value)}
-                          onMouseLeave={() => setHoverRating('')}
-                        >
-                          <RadioGroupItem
-                            id={value}
-                            value={value}
-                            className='sr-only'
-                          />
-                          <Star
-                            size={26}
-                            className={cn(
-                              'fill-transparent text-muted-foreground transition-colors duration-200',
-                              (hoverRating || field.value || '') >= value &&
-                                'fill-orange-400 text-orange-400'
-                            )}
-                          />
-                        </label>
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='content'
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Textarea
-                      placeholder='说说你的看法…'
-                      maxLength={1000}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              type='submit'
-              className='w-full'
-              disabled={!score || !content || loading}
-            >
-              {loading ? '提交中…' : '发表短评'}
-            </Button>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+                      <RadioGroupItem
+                        id={value}
+                        value={value}
+                        className='sr-only'
+                      />
+                      <Star
+                        size={26}
+                        className={cn(
+                          'fill-transparent text-muted-foreground transition-colors duration-200',
+                          (hoverRating || field.value || '') >= value &&
+                            'fill-orange-400 text-orange-400'
+                        )}
+                      />
+                    </label>
+                  ))}
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='content'
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Textarea
+                  placeholder='说说你的看法…'
+                  maxLength={1000}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </Form>
+    </FormDialog>
   );
 };
 

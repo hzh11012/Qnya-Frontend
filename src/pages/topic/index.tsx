@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import Exception from '@/components/custom/exception';
 import PageTitle from '@/components/custom/page-title';
+import ListEmpty from '@/components/custom/list-empty';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { usePagedList } from '@/hooks/use-paged-list';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
@@ -8,12 +8,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getTopicList } from '@/apis/topic';
 import type { TopicItem } from '@/apis/topic';
 import CoverImage from '@/components/custom/cover-image';
+import { ANIME_GRID_HORIZONTAL } from '@/lib/layout';
 
 const PAGE_SIZE = 20;
-
-/** 专题卡片网格：2→3→4→5 随宽度平滑过渡 */
-const TOPIC_GRID_CLASS =
-  'grid grid-cols-2 gap-x-4 gap-y-6 text-sm md:grid-cols-3 md:gap-x-6 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6';
 
 const TopicCardSkeleton: React.FC = () => {
   return (
@@ -88,41 +85,38 @@ const Index = () => {
     if (id) navigate(`/topic/${id}`);
   };
 
-  if (isPending) {
-    return (
-      <div className='my-4 md:my-8'>
-        <PageTitle className='mb-3 md:mb-4'>专题推荐</PageTitle>
-        <div className={TOPIC_GRID_CLASS}>
+  return (
+    <div className='my-4 flex flex-1 flex-col md:my-8'>
+      <PageTitle className='mb-3 md:mb-4'>专题推荐</PageTitle>
+
+      {isPending ? (
+        <div className={ANIME_GRID_HORIZONTAL}>
           {Array.from({ length: 10 }, (_, index) => (
             <TopicCardSkeleton key={index} />
           ))}
         </div>
-      </div>
-    );
-  }
-
-  if (!list.length) {
-    return <Exception type='empty' />;
-  }
-
-  return (
-    <div className='my-4 md:my-8'>
-      <PageTitle className='mb-3 md:mb-4'>专题推荐</PageTitle>
-      <div className={TOPIC_GRID_CLASS}>
-        {list.map(item => (
-          <TopicCard
-            key={item.id}
-            topic={item}
-            onClick={handleTopicClick}
+      ) : !list.length ? (
+        // 空态也保留标题，撑满标题以下的剩余高度
+        <ListEmpty />
+      ) : (
+        <>
+          <div className={ANIME_GRID_HORIZONTAL}>
+            {list.map(item => (
+              <TopicCard
+                key={item.id}
+                topic={item}
+                onClick={handleTopicClick}
+              />
+            ))}
+            {isFetchingNextPage && <TopicCardSkeleton />}
+          </div>
+          {/* 无限滚动哨兵：进入视口时加载下一页 */}
+          <div
+            ref={sentinelRef}
+            aria-hidden
           />
-        ))}
-        {isFetchingNextPage && <TopicCardSkeleton />}
-      </div>
-      {/* 无限滚动哨兵：进入视口时加载下一页 */}
-      <div
-        ref={sentinelRef}
-        aria-hidden
-      />
+        </>
+      )}
     </div>
   );
 };

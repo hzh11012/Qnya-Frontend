@@ -1,18 +1,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { formatScore } from '@/lib/anime';
+import { formatScore, getPlayStatusText } from '@/lib/anime';
 import type { PlayDetail } from '@/apis/play';
 import { ChevronDown, Heart, PlayCircle } from 'lucide-react';
 import AnimeRating, { type RatingFormValues } from '@/pages/anime/anime-rating';
-
-/** 播放页状态文案：即将开播优先于剧集数，连载中/已完结带前缀，与列表页的简洁版区分 */
-const getRemark = (item: { status: string; videoCount: number }) => {
-  if (item.status === 'upcoming' || !item.videoCount) return '即将开播';
-  return item.status === 'completed'
-    ? `已完结，全${item.videoCount}话`
-    : `连载中，更新至第${item.videoCount}话`;
-};
 
 interface AnimeDescriptionProps {
   detail: PlayDetail;
@@ -70,7 +62,7 @@ const AnimeDescription: React.FC<AnimeDescriptionProps> = ({
         </Button>
       </div>
       <div className='text-xs leading-none mt-1.5 text-card-foreground'>
-        {getRemark(detail)}
+        {getPlayStatusText(detail)}
       </div>
       <div className='flex items-center text-xs mt-2 gap-3 text-card-foreground'>
         <div className='flex items-center gap-1'>

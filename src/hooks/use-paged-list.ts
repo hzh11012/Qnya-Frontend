@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 
 /** 分页响应统一形态 */
 interface Paged<T> {
@@ -16,6 +16,14 @@ interface UsePagedListOptions<T> {
   enabled?: boolean;
   /** 覆盖全局 staleTime（如播放页会写入历史/追番，进入列表页需拉最新数据时传 0） */
   staleTime?: number;
+  /** 轮询间隔：大厅这类「别人随时会创建/解散」的列表需要定期自愈 */
+  refetchInterval?: number;
+  /**
+   * 切筛选/关键词时保留上一份数据占位，避免整片骨架闪一下。
+   * 开启后换 key 期间 `isPending` 不会变 true（只会在首次无数据时变），
+   * 由 `isPlaceholderData` 表示「现在展示的是上一组条件的结果」，页面据此做半透明提示。
+   */
+  keepPrevious?: boolean;
 }
 
 /**
@@ -27,13 +35,17 @@ const usePagedList = <T>({
   queryKey,
   fetchPage,
   enabled = true,
-  staleTime
+  staleTime,
+  refetchInterval,
+  keepPrevious = false
 }: UsePagedListOptions<T>) => {
   const query = useInfiniteQuery({
     queryKey,
     queryFn: ({ pageParam }) => fetchPage(pageParam),
     initialPageParam: 1,
     staleTime,
+    refetchInterval,
+    placeholderData: keepPrevious ? keepPreviousData : undefined,
     getNextPageParam: (lastPage, allPages) => {
       const fetched = allPages.reduce(
         (sum, page) => sum + page.items.length,

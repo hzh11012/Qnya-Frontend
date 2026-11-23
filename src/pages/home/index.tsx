@@ -10,6 +10,7 @@ import { getHome } from '@/apis/home';
 import type { HomeTypeRow } from '@/apis/home';
 import { getGuessList } from '@/apis/anime';
 import { usePagedList } from '@/hooks/use-paged-list';
+import { ANIME_GRID, ANIME_GRID_HORIZONTAL } from '@/lib/layout';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { getStatusText } from '@/lib/anime';
 import { formatProgress } from '@/lib/format';
@@ -34,13 +35,11 @@ const TYPE_CODE: Record<HomeTypeRow['type'], string> = {
   adult: '5'
 };
 
-/** 追番行网格：横版卡片宽一档，列数比类型推荐少一（3/4/5/6），断点与猜你喜欢一致 */
-const FOLLOW_GRID_CLASS =
-  'grid grid-cols-2 justify-items-center gap-4 text-sm md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6';
+/** 追番行网格：横版卡片宽一档，列数比类型推荐少一；卡片有 max-w 上限，需居中 */
+const FOLLOW_GRID_CLASS = cn(ANIME_GRID_HORIZONTAL, 'justify-items-center');
 
-/** 类型推荐行网格：列数梯度与猜你喜欢（GUESS_GRID_CLASS）完全一致 */
-const TYPE_GRID_CLASS =
-  'grid grid-cols-3 justify-items-center gap-4 text-sm md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
+/** 类型推荐行网格：与猜你喜欢同一套竖版梯度 */
+const TYPE_GRID_CLASS = cn(ANIME_GRID, 'justify-items-center');
 
 /**
  * 首页单行卡片的降级显示：全程网格布局，列数随标准断点（md/lg/xl/2xl）增加、
@@ -80,10 +79,9 @@ const getResponsiveClasses = (
   return cn(...conditionalClasses, mobileHidden);
 };
 
-/** 猜你喜欢：每页条数与网格列数（断点与热门页一致） */
+/** 猜你喜欢：每页条数与网格列数（与热门页同一套梯度） */
 const GUESS_PAGE_SIZE = 20;
-const GUESS_GRID_CLASS =
-  'grid grid-cols-3 justify-items-center gap-x-4 gap-y-6 text-sm md:grid-cols-4 md:gap-x-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
+const GUESS_GRID_CLASS = cn(ANIME_GRID, 'justify-items-center');
 
 /** 猜你喜欢随机种子：每会话生成一次，同一会话内分页顺序稳定，刷新会话换一批 */
 const getGuessSeed = () => {

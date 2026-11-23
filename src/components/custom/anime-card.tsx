@@ -103,12 +103,15 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
         <div className='bg-card-cover absolute -bottom-0.5 z-1 h-10 w-full' />
       </div>
       <div className='mt-2.5 flex w-full items-center gap-1'>
-        <div
-          className='line-clamp-1 min-w-0 flex-1 cursor-pointer text-sm transition-[color] duration-200 hover:text-primary'
-          title={title}
-          onClick={onClick}
-        >
-          {title}
+        {/* 外层撑满给 action 让位，文字本身 w-fit：悬停变色区只到文字宽度 */}
+        <div className='min-w-0 flex-1'>
+          <div
+            className='line-clamp-1 w-fit max-w-full cursor-pointer text-sm transition-[color] duration-200 hover:text-primary'
+            title={title}
+            onClick={onClick}
+          >
+            {title}
+          </div>
         </div>
         {action}
       </div>

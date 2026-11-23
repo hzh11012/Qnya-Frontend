@@ -1,22 +1,20 @@
 import React from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import Exception from '@/components/custom/exception';
-import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
+import { AnimeCardSkeleton } from '@/components/custom/anime-card';
+import AnimeListCard from '@/components/custom/anime-list-card';
+import ListEmpty from '@/components/custom/list-empty';
 import { getClientList, getClientTags } from '@/apis/anime';
 import type { ClientAnimeItem } from '@/apis/anime';
 import { usePagedList } from '@/hooks/use-paged-list';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useDocumentTitle } from '@/hooks/use-document-title';
-import { getStatusText } from '@/lib/anime';
+import { cn } from '@/lib/utils';
+import { ANIME_GRID } from '@/lib/layout';
 import { useAuthStore } from '@/store/auth';
 import FilterRow, { type FilterOption } from './filter-row';
 
 const PAGE_SIZE = 20;
-
-/** 番剧卡片网格：与热门页一致（2→3→4→5→6→7 随宽度平滑过渡） */
-const GRID_CLASS =
-  'grid grid-cols-3 gap-x-4 gap-y-6 text-sm md:grid-cols-4 md:gap-x-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
 
 /** 对外参数统一数字码，与后端映射一致 */
 const SORT_LIST = [
@@ -232,26 +230,12 @@ const BangumiSelect: React.FC<BangumiSelectProps> = ({ filter, onChange }) => {
 
 /** 卡片骨架网格 */
 const ListSkeleton: React.FC<{ count?: number }> = ({ count = 14 }) => (
-  <div className={GRID_CLASS}>
+  <div className={ANIME_GRID}>
     {Array.from({ length: count }, (_, i) => (
       <AnimeCardSkeleton key={i} />
     ))}
   </div>
 );
-
-/** 列表卡片 */
-const ListCard: React.FC<{ item: ClientAnimeItem }> = ({ item }) => {
-  const navigate = useNavigate();
-  return (
-    <AnimeCard
-      title={item.name}
-      image={item.cover ?? ''}
-      remark={item.remark ?? ''}
-      tip={getStatusText(item)}
-      onClick={() => item.videoId && navigate(`/anime/${item.videoId}`)}
-    />
-  );
-};
 
 /**
  * @title 番剧筛选页
@@ -261,30 +245,41 @@ const Bangumi: React.FC = () => {
   useDocumentTitle('番剧库');
   const { filter, handleChange } = useBangumiFilter();
 
-  const { list, fetchMore, isPending, isFetchingNextPage, hasNextPage } =
-    usePagedList<ClientAnimeItem>({
-      queryKey: ['bangumi', 'list', filter],
-      fetchPage: page =>
-        getClientList({
-          page,
-          pageSize: PAGE_SIZE,
-          year: filter.year,
-          tag: filter.tag,
-          // 数字码参数转数字传给后端（zod transform 回内部枚举）
-          sort: Number(filter.sort) || undefined,
-          type: filter.type ? Number(filter.type) : undefined,
-          status: filter.status ? Number(filter.status) : undefined,
-          month: filter.month ? Number(filter.month) : undefined
-        })
-    });
+  const {
+    list,
+    fetchMore,
+    isPending,
+    isFetchingNextPage,
+    isPlaceholderData,
+    hasNextPage
+  } = usePagedList<ClientAnimeItem>({
+    queryKey: ['bangumi', 'list', filter],
+    // 换筛选时保留上一屏并压暗，避免整片骨架闪一下
+    keepPrevious: true,
+    fetchPage: page =>
+      getClientList({
+        page,
+        pageSize: PAGE_SIZE,
+        year: filter.year,
+        tag: filter.tag,
+        // 数字码参数转数字传给后端（zod transform 回内部枚举）
+        sort: Number(filter.sort) || undefined,
+        type: filter.type ? Number(filter.type) : undefined,
+        status: filter.status ? Number(filter.status) : undefined,
+        month: filter.month ? Number(filter.month) : undefined
+      })
+  });
 
+  // 占位数据还在时不要触发翻页：那一页的页码是按旧条件算的
   const sentinelRef = useInfiniteScroll(
     fetchMore,
-    !hasNextPage || isFetchingNextPage
+    !hasNextPage || isFetchingNextPage || isPlaceholderData
   );
 
   return (
-    <div className='my-4 md:my-8'>
+    // flex 列 + flex-1：空态（ListEmpty）靠 flex-1 吃掉标题以下的剩余高度，
+    // 普通块级容器里 flex-1 不生效，插画会贴在筛选行下面
+    <div className='my-4 flex flex-1 flex-col md:my-8'>
       <BangumiSelect
         filter={filter}
         onChange={handleChange}
@@ -293,14 +288,18 @@ const Bangumi: React.FC = () => {
       {isPending ? (
         <ListSkeleton />
       ) : list.length === 0 ? (
-        <div className='h-80'>
-          <Exception type='empty' />
-        </div>
+        <ListEmpty />
       ) : (
-        <div>
-          <div className={GRID_CLASS}>
+        <div
+          aria-busy={isPlaceholderData}
+          className={cn(
+            'transition-opacity duration-150',
+            isPlaceholderData && 'pointer-events-none opacity-50'
+          )}
+        >
+          <div className={ANIME_GRID}>
             {list.map(item => (
-              <ListCard
+              <AnimeListCard
                 key={item.id}
                 item={item}
               />

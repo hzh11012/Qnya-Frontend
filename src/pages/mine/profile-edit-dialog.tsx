@@ -1,14 +1,5 @@
-import { Loader2Icon } from 'lucide-react';
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
+import FormDialog from '@/components/custom/form-dialog';
 import { Input } from '@/components/ui/input';
 import { useUpdateProfile } from '@/hooks/use-update-profile';
 import { useAuthStore } from '@/store/auth';
@@ -23,23 +14,15 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
   open,
   onOpenChange
 }) => {
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      {/* Content 关闭即卸载，表单状态随打开重新初始化 */}
-      {open && <NameForm onOpenChange={onOpenChange} />}
-    </Dialog>
-  );
-};
-
-const NameForm: React.FC<{ onOpenChange: (open: boolean) => void }> = ({
-  onOpenChange
-}) => {
   const user = useAuthStore(state => state.user)!;
   const [name, setName] = useState(user.name);
   const mutation = useUpdateProfile(() => onOpenChange(false));
+
+  // 每次打开都回到当前名称：上次没保存的输入不带进下一次
+  const handleOpenChange = (next: boolean) => {
+    if (next) setName(user.name);
+    onOpenChange(next);
+  };
 
   const handleSave = () => {
     const trimmedName = name.trim();
@@ -48,16 +31,25 @@ const NameForm: React.FC<{ onOpenChange: (open: boolean) => void }> = ({
   };
 
   return (
-    <DialogContent className='max-w-sm'>
-      <DialogHeader>
-        <DialogTitle className='sm:text-left'>编辑资料</DialogTitle>
-        <DialogDescription className='sr-only'>修改你的名称</DialogDescription>
-      </DialogHeader>
-
-      <div className='space-y-1.5 py-2'>
+    <FormDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      title='编辑资料'
+      description='修改你的名称'
+      // 标题已经说明清楚了，说明只留给读屏
+      descriptionClassName='sr-only'
+      confirmText='保存'
+      confirmDisabled={!name.trim()}
+      loading={mutation.isPending}
+      onSubmit={event => {
+        event.preventDefault();
+        handleSave();
+      }}
+    >
+      <div className='flex flex-col gap-1.5'>
         <Input
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={event => setName(event.target.value)}
           placeholder='输入名称'
           maxLength={30}
           autoFocus
@@ -66,31 +58,7 @@ const NameForm: React.FC<{ onOpenChange: (open: boolean) => void }> = ({
           <p className='text-xs text-destructive'>名称不能为空</p>
         )}
       </div>
-
-      <DialogFooter className='flex-row gap-2 sm:gap-2'>
-        <Button
-          variant='outline'
-          className='h-9 flex-1'
-          onClick={() => onOpenChange(false)}
-          disabled={mutation.isPending}
-        >
-          取消
-        </Button>
-        <Button
-          className='h-9 flex-1'
-          onClick={handleSave}
-          disabled={mutation.isPending || !name.trim()}
-        >
-          {mutation.isPending && (
-            <Loader2Icon
-              className='animate-spin'
-              size={16}
-            />
-          )}
-          保存
-        </Button>
-      </DialogFooter>
-    </DialogContent>
+    </FormDialog>
   );
 };
 

@@ -10,17 +10,9 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { AnimeCard, AnimeCardSkeleton } from '@/components/custom/anime-card';
+import { ANIME_GRID, ANIME_GRID_HORIZONTAL } from '@/lib/layout';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
+import FormDialog from '@/components/custom/form-dialog';
 import {
   clearMyHistories,
   deleteMyHistory,
@@ -37,13 +29,11 @@ import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 /** 追番/历史分页大小（与其他列表页一致） */
 const PAGE_SIZE = 20;
 
-/** 追番网格（竖版卡）：列数梯度与首页推荐/猜你喜欢一致（标准断点） */
-const COLLECTION_GRID_CLASS =
-  'grid gap-4 grid-cols-3 text-sm md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
+/** 追番/历史共用的网格梯度（与热门、番剧库同一套） */
+const COLLECTION_GRID_CLASS = ANIME_GRID;
 
-/** 历史网格（横向卡）：列数梯度与首页我的追番一致（标准断点） */
-const HISTORY_GRID_CLASS =
-  'grid gap-4 grid-cols-2 text-sm md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6';
+/** 历史（横向卡）：列数比竖版少一 */
+const HISTORY_GRID_CLASS = ANIME_GRID_HORIZONTAL;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -273,7 +263,7 @@ export const MineHistory: React.FC<{ keyword: string }> = ({ keyword }) => {
   );
 };
 
-/** 清空历史记录：点击弹出二次确认框（与站内其他弹窗同款 Dialog），确认后才清空 */
+/** 清空历史记录：点击弹出二次确认框（与站内其他弹窗同款） */
 const ClearHistoriesButton: React.FC = () => {
   const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -287,43 +277,23 @@ const ClearHistoriesButton: React.FC = () => {
   });
 
   return (
-    <Dialog
+    <FormDialog
       open={confirmOpen}
       onOpenChange={setConfirmOpen}
-    >
-      <DialogTrigger asChild>
+      trigger={
         <button
           className='cursor-pointer text-xs text-muted-foreground transition-colors duration-200 select-none hover:text-primary disabled:opacity-50'
           disabled={clear.isPending}
         >
           清空历史记录
         </button>
-      </DialogTrigger>
-      <DialogContent className='max-w-sm'>
-        <DialogHeader>
-          <DialogTitle className='sm:text-left'>清空历史记录？</DialogTitle>
-          <DialogDescription>
-            全部观看历史将被删除，此操作无法撤销。
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className='flex-row gap-2 sm:gap-2'>
-          <Button
-            variant='outline'
-            className='h-9 flex-1'
-            onClick={() => setConfirmOpen(false)}
-          >
-            取消
-          </Button>
-          <Button
-            className='h-9 flex-1'
-            disabled={clear.isPending}
-            onClick={() => clear.mutate()}
-          >
-            清空
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      }
+      title='清空历史记录？'
+      description='全部观看历史将被删除，此操作无法撤销。'
+      confirmText='清空'
+      loading={clear.isPending}
+      onConfirm={() => clear.mutate()}
+    />
   );
 };
 
